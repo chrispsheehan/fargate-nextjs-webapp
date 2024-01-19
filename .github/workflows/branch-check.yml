@@ -1,0 +1,30 @@
+name: Branch Check
+
+on:
+  push:
+      branches-ignore:
+        - main
+
+env:
+  aws_account_id: ${{ vars.AWS_ACCOUNT_ID }}
+  aws_region: ${{ vars.AWS_REGION }}
+  aws_role: ${{ vars.AWS_ROLE_VALIDATE_ONLY }}
+
+jobs:
+  terraform-check:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Terraform checks
+        uses: ./.github/actions/terraform_check
+        with:
+          aws_account_id: ${{ env.aws_account_id }}
+          aws_region: ${{ env.aws_region }}
+          aws_role: ${{ env.aws_role }}
