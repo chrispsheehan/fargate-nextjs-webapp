@@ -1,0 +1,43 @@
+name: Deploy
+
+on:
+    push:
+        branches:
+            - main
+
+env:
+  aws_account_id: ${{ vars.AWS_ACCOUNT_ID }}
+  aws_region: ${{ vars.AWS_REGION }}
+  aws_role: ${{ vars.AWS_ROLE }}
+
+permissions:
+  id-token: write
+  contents: read
+      
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+            fetch-depth: 0
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+            aws-region: ${{ env.aws_region }}
+            role-to-assume: arn:aws:iam::${{ env.aws_account_id }}:role/${{ env.aws_role }}
+            role-session-name: GitHubActions
+
+      - name: Init
+        shell: bash
+        run: |
+            cd tf
+            terraform init
+    
+      - name: Action
+        shell: bash
+        id: action
+        run: |
+            cd tf
+            terraform apply -auto-approve
