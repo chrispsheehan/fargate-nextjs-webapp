@@ -2,8 +2,8 @@ name: Branch Check
 
 on:
   push:
-      branches-ignore:
-        - main
+      # branches-ignore:
+      #   - main
 
 env:
   aws_account_id: ${{ vars.AWS_ACCOUNT_ID }}
