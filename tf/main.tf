@@ -21,10 +21,10 @@ resource "aws_ecs_task_definition" "app_task" {
 
   execution_role_arn = aws_iam_role.ecs_execution_role.arn
 
-  container_definitions = jsonencode([{
+  container_definitions = templatefile("templates/task.json", {
     name  = var.container-name
     image = aws_ecr_repository.ecr.repository_url
-  }])
+  })
 }
 
 resource "aws_ecs_service" "service" {
