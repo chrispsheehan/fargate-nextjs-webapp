@@ -2,6 +2,10 @@ resource "aws_ecr_repository" "ecr" {
   name = "${var.project-name}-ecr"
 }
 
+resource "aws_ecs_cluster" "ecs" {
+  name = "${var.project-name}-ecs"
+}
+
 resource "aws_iam_role" "ecs_execution_role" {
   name               = "${var.project-name}-iam"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
@@ -21,12 +25,18 @@ resource "aws_ecs_task_definition" "app_task" {
 
   execution_role_arn = aws_iam_role.ecs_execution_role.arn
 
-  container_definitions = local.fargate_task_definition
+  container_definitions = jsonencode([
+    {
+      name      = "${var.project-name}-first"
+      image     = "${var.container-image}"
+    }
+  ])
+
 }
 
 resource "aws_ecs_service" "service" {
   name            = "${var.project-name}-service"
-  cluster         = "default"
+  cluster         = aws_ecs_cluster.ecs.name
   task_definition = aws_ecs_task_definition.app_task.arn
   launch_type     = "FARGATE"
   desired_count   = 1
