@@ -9,7 +9,27 @@ variable "project-name" {
   default = "fargate-nextjs-webapp"
 }
 
-variable "container-name" {
+variable "container-image" {
   type    = string
-  default = "nextjs-app:1.0"
+  default = "nginx:latest"
+}
+
+variable "cpu" {
+  type    = number
+  default = 256
+}
+
+variable "memory" {
+  type    = number
+  default = 512
+}
+
+variable "container-port" {
+  type    = number
+  default = 80
+}
+
+variable "host_port" {
+  type    = number
+  default = 80
 }
