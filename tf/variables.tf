@@ -4,6 +4,17 @@ variable "region" {
   default     = "eu-west-2"
 }
 
+variable "instance-tenancy" {
+  description = "it defines the tenancy of VPC. Whether it's default or dedicated"
+  type        = string
+  default     = "default"
+}
+variable "custom-vpc" {
+  description = "Fargate vpc"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
 variable "project-name" {
   type    = string
   default = "fargate-nextjs-webapp"
