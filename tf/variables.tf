@@ -5,6 +5,11 @@ variable "region" {
 }
 
 variable "project-name" {
-  type        = string
-  default     = "fargate-nextjs-webapp"
+  type    = string
+  default = "fargate-nextjs-webapp"
+}
+
+variable "container-name" {
+  type    = string
+  default = "nextjs-app:1.0"
 }
