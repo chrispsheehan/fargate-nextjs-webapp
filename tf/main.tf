@@ -18,7 +18,7 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_role_attachment" {
 
 resource "aws_ecs_task_definition" "app_task" {
   family                   = "${var.project-name}-task"
-  network_mode             = "awsvpc"
+  # network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
