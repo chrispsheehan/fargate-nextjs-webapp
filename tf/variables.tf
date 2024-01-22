@@ -4,23 +4,18 @@ variable "region" {
   default     = "eu-west-2"
 }
 
-variable "instance-tenancy" {
-  description = "it defines the tenancy of VPC. Whether it's default or dedicated"
-  type        = string
-  default     = "default"
-}
-variable "custom-vpc" {
+variable "vpc_cidr_block" {
   description = "Fargate vpc"
   type        = string
   default     = "10.0.0.0/16"
 }
 
-variable "project-name" {
+variable "project_name" {
   type    = string
   default = "fargate-nextjs-webapp"
 }
 
-variable "container-image" {
+variable "container_image" {
   type    = string
   default = "nginx:latest"
 }
@@ -35,7 +30,7 @@ variable "memory" {
   default = 512
 }
 
-variable "container-port" {
+variable "container_port" {
   type    = number
   default = 80
 }
@@ -43,4 +38,8 @@ variable "container-port" {
 variable "host_port" {
   type    = number
   default = 80
+}
+
+variable "desired_count" {
+  default = 2
 }
