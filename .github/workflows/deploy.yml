@@ -41,3 +41,8 @@ jobs:
         run: |
             cd tf
             terraform apply -auto-approve
+            ECR_URL=$(terraform output -raw ecr-repo-url)
+            $(aws ecr get-login --no-include-email --region ${{ env.aws_region }})
+            docker pull nginx:latest
+            docker tag nginx:latest $ECR_URL:latest
+            docker push $ECR_URL:latest
