@@ -11,6 +11,6 @@ data "aws_iam_policy_document" "assume_role" {
       identifiers = ["ecs-tasks.amazonaws.com"]
     }
 
-    actions = ["sts:AssumeRole", "ecr:*", "ecs:*"]
+    actions = ["sts:AssumeRole"]
   }
 }
