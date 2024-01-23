@@ -43,7 +43,7 @@ resource "aws_subnet" "public_subnet" {
   }
 }
 
-resource "aws_route_table_association" "example_association" {
+resource "aws_route_table_association" "public_association" {
   count          = var.desired_count
   subnet_id      = aws_subnet.public_subnet[count.index].id
   route_table_id = aws_route_table.public_rt.id
@@ -61,6 +61,12 @@ resource "aws_subnet" "private_subnet" {
   tags = {
     Name = "${var.project_name}-private-subnet-${count.index}"
   }
+}
+
+resource "aws_route_table_association" "private_association" {
+  count          = var.desired_count
+  subnet_id      = aws_subnet.private_subnet[count.index].id
+  route_table_id = aws_route_table.public_rt.id
 }
 
 resource "aws_ecr_repository" "nginx" {
