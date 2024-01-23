@@ -184,7 +184,7 @@ resource "aws_ecs_service" "fargate_service" {
   desired_count = var.desired_count
 
   network_configuration {
-    subnets         = aws_subnet.private_subnet[*].id
+    subnets         = flatten([aws_subnet.private_subnet[*].id, aws_subnet.public_subnet[*].id])
     security_groups = [aws_security_group.allow_all.id]
   }
 
