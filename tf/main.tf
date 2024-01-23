@@ -44,8 +44,8 @@ resource "aws_subnet" "public_subnet" {
 }
 
 resource "aws_subnet" "private_subnet" {
-  depends_on = [ aws_subnet.public_subnet ]
-  
+  depends_on = [aws_subnet.public_subnet]
+
   count = var.desired_count
 
   vpc_id            = aws_vpc.vpc.id
@@ -65,33 +65,54 @@ resource "aws_ecs_cluster" "ecs" {
   name = "${var.project_name}-ecs-cluster"
 }
 
-resource "aws_security_group" "sg" {
-  name        = "CustomSG"
-  description = "Allow TLS inbound traffic"
+resource "aws_security_group" "allow_all" {
+  name        = "${local.formatted_name}_allow_all"
+  description = "Allow all inbound and outbound traffic"
   vpc_id      = aws_vpc.vpc.id
-  egress = [
-    {
-      description      = "for all outgoing traffics"
-      from_port        = 0
-      to_port          = 0
-      protocol         = "-1"
-      cidr_blocks      = ["0.0.0.0/0"]
-      ipv6_cidr_blocks = ["::/0"]
-      prefix_list_ids  = []
-      security_groups  = []
-      self             = false
-    }
-  ]
 
   ingress {
-    from_port   = var.container_port
-    to_port     = var.host_port
-    protocol    = "tcp"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  tags = {
-    Name = "Load balancer security group"
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+resource "aws_lb" "example" {
+  name               = "${var.project_name}-lb"
+  internal           = false
+  load_balancer_type = "application"
+
+  enable_deletion_protection = false
+
+  security_groups = [aws_security_group.allow_all.id]
+  subnets         = aws_subnet.public_subnet[*].id
+}
+
+resource "aws_lb_listener" "example" {
+  load_balancer_arn = aws_lb.example.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.example.arn
+  }
+}
+
+resource "aws_lb_target_group" "example" {
+  name        = "${var.project_name}-tg"
+  port        = var.container_port
+  protocol    = "HTTP"
+  target_type = "ip"
+  vpc_id      = aws_vpc.vpc.id
 }
 
 resource "aws_ecs_task_definition" "fargate_task" {
@@ -129,6 +150,8 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_role_policy_attachment"
 }
 
 resource "aws_ecs_service" "fargate_service" {
+  depends_on = [aws_lb.example, aws_lb_target_group.example]
+
   name            = "${var.project_name}-service"
   cluster         = aws_ecs_cluster.ecs.id
   task_definition = aws_ecs_task_definition.fargate_task.arn
@@ -138,42 +161,13 @@ resource "aws_ecs_service" "fargate_service" {
   desired_count = var.desired_count
 
   network_configuration {
-    subnets = aws_subnet.private_subnet[*].id
+    subnets         = aws_subnet.private_subnet[*].id
+    security_groups = [aws_security_group.allow_all.id]
   }
-}
 
-resource "aws_lb" "app" {
-  name               = "${var.project_name}-app-lb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.sg.id]
-  subnets = aws_subnet.public_subnet[*].id
-}
-
-resource "aws_lb_listener" "front_end" {
-  load_balancer_arn = aws_lb.app.arn
-  port              = var.container_port
-  protocol          = "HTTP"
-
-  default_action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      status_code  = "200"
-      message_body = "OK"
-    }
+  load_balancer {
+    target_group_arn = aws_lb_target_group.example.arn
+    container_name   = "${var.project_name}-container"
+    container_port   = var.container_port
   }
-}
-
-resource "aws_lb_target_group" "target_group" {
-  name     = "${var.project_name}-tg"
-  port     = var.container_port
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.vpc.id
-}
-
-resource "aws_lb_target_group_attachment" "ecs" {
-  target_group_arn = aws_lb_target_group.target_group.arn
-  target_id        = aws_ecs_task_definition.fargate_task.arn
-  port             = var.container_port
 }

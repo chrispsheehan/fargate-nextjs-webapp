@@ -1,4 +1,5 @@
 locals {
-    public_subnets = [for i in range(var.desired_count) : cidrsubnet(var.vpc_cidr_block, 8, i)]
-    private_subnets = [for i in range(var.desired_count) : cidrsubnet(var.vpc_cidr_block, 8, i + var.desired_count)]
+  formatted_name  = replace(var.project_name, "-", "_")
+  public_subnets  = [for i in range(var.desired_count) : cidrsubnet(var.vpc_cidr_block, 8, i)]
+  private_subnets = [for i in range(var.desired_count) : cidrsubnet(var.vpc_cidr_block, 8, i + var.desired_count)]
 }
