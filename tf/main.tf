@@ -131,10 +131,10 @@ resource "aws_lb_target_group" "example" {
     path                = "/health"  # Replace with your health check path
     protocol            = "HTTP"
     port                = var.container_port
-    interval            = 3
-    timeout             = 10
-    healthy_threshold   = 3
-    unhealthy_threshold = 3
+    interval            = 5
+    timeout             = 2
+    healthy_threshold   = 5
+    unhealthy_threshold = 5
   }
 }
 
