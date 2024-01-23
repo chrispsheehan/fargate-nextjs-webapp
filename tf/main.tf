@@ -43,6 +43,12 @@ resource "aws_subnet" "public_subnet" {
   }
 }
 
+resource "aws_route_table_association" "example_association" {
+  count          = var.desired_count
+  subnet_id      = aws_subnet.public_subnet[count.index].id
+  route_table_id = aws_route_table.public_rt.id
+}
+
 resource "aws_subnet" "private_subnet" {
   depends_on = [aws_subnet.public_subnet]
 
