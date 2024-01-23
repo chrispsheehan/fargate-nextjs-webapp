@@ -15,9 +15,9 @@ variable "project_name" {
   default = "fargate-nextjs-webapp"
 }
 
-variable "container_image" {
+variable "image_tag" {
   type    = string
-  default = "nginx:latest"
+  default = "latest"
 }
 
 variable "cpu" {

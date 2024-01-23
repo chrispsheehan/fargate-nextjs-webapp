@@ -63,8 +63,8 @@ resource "aws_subnet" "private_subnet" {
   }
 }
 
-resource "aws_ecr_repository" "ecr" {
-  name = "${var.project_name}-ecr"
+resource "aws_ecr_repository" "nginx" {
+  name = "${var.project_name}-nginx"
 }
 
 resource "aws_ecs_cluster" "ecs" {
@@ -118,7 +118,18 @@ resource "aws_lb_target_group" "example" {
   port        = var.container_port
   protocol    = "HTTP"
   target_type = "ip"
+
   vpc_id      = aws_vpc.vpc.id
+
+  health_check {
+    path                = "/health"  # Replace with your health check path
+    protocol            = "HTTP"
+    port                = var.container_port
+    interval            = 30
+    timeout             = 10
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
+  }
 }
 
 resource "aws_ecs_task_definition" "fargate_task" {
@@ -133,7 +144,7 @@ resource "aws_ecs_task_definition" "fargate_task" {
   container_definitions = jsonencode([
     {
       name  = "${var.project_name}-container"
-      image = var.container_image
+      image = "${aws_ecr_repository.nginx.repository_url}:${image_tag}"
       portMappings = [
         {
           containerPort = var.container_port
