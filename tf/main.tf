@@ -1,4 +1,4 @@
-resource "aws_ecr_repository" "nginx" {
+data "aws_ecr_repository" "nginx" {
   name = "${var.project_name}-nginx"
 }
 
