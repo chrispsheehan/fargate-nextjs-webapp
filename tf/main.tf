@@ -30,19 +30,22 @@ resource "aws_route_table" "rt" {
 }
 
 resource "aws_subnet" "public_subnet" {
-  vpc_id            = aws_vpc.vpc.id
-  cidr_block        = "10.0.1.0/24"
+  count = local.az_count
+
+  vpc_id                  = aws_vpc.vpc.id
+  availability_zone       = data.aws_availability_zones.azs.names[count.index]
+  cidr_block              = local.subnets[count.index]
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "${var.project_name}-subnet"
+    Name = "${var.project_name}-public-subnet-${count.index}"
   }
 }
 
+resource "aws_route_table_association" "public_association" {
+  count          = local.az_count
 
-
-resource "aws_route_table_association" "rta" {
-  subnet_id      = aws_subnet.public_subnet.id
+  subnet_id      = aws_subnet.public_subnet[count.index].id
   route_table_id = aws_route_table.rt.id
 }
 
@@ -92,7 +95,7 @@ resource "aws_ecs_task_definition" "ecs_task" {
   memory                   = "512"
 
   execution_role_arn = aws_iam_role.ecs_execution_role.arn
-  task_role_arn  = aws_iam_role.ecs_execution_role.arn
+  task_role_arn      = aws_iam_role.ecs_execution_role.arn
 
   container_definitions = jsonencode([{
     name  = "nginx",
@@ -111,8 +114,8 @@ resource "aws_ecs_service" "fargate_service" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets = [aws_subnet.public_subnet.id]
-    security_groups = [aws_security_group.sg.id]
+    subnets          = aws_subnet.public_subnet.*.id
+    security_groups  = [aws_security_group.sg.id]
     assign_public_ip = true
   }
 

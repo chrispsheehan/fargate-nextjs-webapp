@@ -43,3 +43,7 @@ variable "host_port" {
 variable "desired_count" {
   default = 2
 }
+
+variable "max_az" {
+  default = 3
+}
