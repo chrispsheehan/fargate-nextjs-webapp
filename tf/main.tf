@@ -1,10 +1,5 @@
-data "aws_ecr_repository" "nginx" {
-  name = "${var.project_name}-nginx"
-}
-
-# Create a VPC
-resource "aws_vpc" "example_vpc" {
-  cidr_block           = "10.0.0.0/16"
+resource "aws_vpc" "vpc" {
+  cidr_block           = var.vpc_cidr_block
   enable_dns_support   = true
   enable_dns_hostnames = true
 
@@ -13,18 +8,16 @@ resource "aws_vpc" "example_vpc" {
   }
 }
 
-# Create an Internet Gateway
-resource "aws_internet_gateway" "example_igw" {
-  vpc_id = aws_vpc.example_vpc.id
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.vpc.id
 
   tags = {
     Name = "${var.project_name}-igw"
   }
 }
 
-# Create a Public Subnet
-resource "aws_subnet" "example_subnet" {
-  vpc_id            = aws_vpc.example_vpc.id
+resource "aws_subnet" "public_subnet" {
+  vpc_id            = aws_vpc.vpc.id
   cidr_block        = "10.0.1.0/24"
   map_public_ip_on_launch = true
 
@@ -33,13 +26,12 @@ resource "aws_subnet" "example_subnet" {
   }
 }
 
-# Create a Route Table
-resource "aws_route_table" "example_rt" {
-  vpc_id = aws_vpc.example_vpc.id
+resource "aws_route_table" "rt" {
+  vpc_id = aws_vpc.vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.example_igw.id
+    gateway_id = aws_internet_gateway.igw.id
   }
 
   tags = {
@@ -47,15 +39,13 @@ resource "aws_route_table" "example_rt" {
   }
 }
 
-# Associate Route Table with the Subnet
-resource "aws_route_table_association" "example_rta" {
-  subnet_id      = aws_subnet.example_subnet.id
-  route_table_id = aws_route_table.example_rt.id
+resource "aws_route_table_association" "rta" {
+  subnet_id      = aws_subnet.public_subnet.id
+  route_table_id = aws_route_table.rt.id
 }
 
-# Create a Security Group
-resource "aws_security_group" "example_sg" {
-  vpc_id = aws_vpc.example_vpc.id
+resource "aws_security_group" "sg" {
+  vpc_id = aws_vpc.vpc.id
 
   ingress {
     from_port   = 80
@@ -76,13 +66,12 @@ resource "aws_security_group" "example_sg" {
   }
 }
 
-# Create an ECS Cluster
-resource "aws_ecs_cluster" "example_cluster" {
-  name = "${var.project_name}-cluster"
+resource "aws_ecs_cluster" "ecs" {
+  name = "${var.project_name}-ecs"
 }
 
 resource "aws_iam_role" "ecs_execution_role" {
-  name = "ecs_execution_role"
+  name = "${local.formatted_name}_ecs_execution_role"
 
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
@@ -93,8 +82,7 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_role_attachment" {
   role       = aws_iam_role.ecs_execution_role.name
 }
 
-# ECS Task Definition
-resource "aws_ecs_task_definition" "example_task" {
+resource "aws_ecs_task_definition" "ecs_task" {
   family                   = "${var.project_name}-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
@@ -106,7 +94,7 @@ resource "aws_ecs_task_definition" "example_task" {
 
   container_definitions = jsonencode([{
     name  = "nginx",
-    image = "${aws_ecr_repository.nginx.repository_url}:latest",
+    image = "${data.aws_ecr_repository.nginx.repository_url}:latest",
     portMappings = [{
       containerPort = 80,
       hostPort      = 80
@@ -114,16 +102,15 @@ resource "aws_ecs_task_definition" "example_task" {
   }])
 }
 
-# Create an ECS Service
-resource "aws_ecs_service" "example_service" {
+resource "aws_ecs_service" "fargate_service" {
   name            = "${var.project_name}-service"
-  cluster         = aws_ecs_cluster.example_cluster.id
-  task_definition = aws_ecs_task_definition.example_task.arn
+  cluster         = aws_ecs_cluster.ecs.id
+  task_definition = aws_ecs_task_definition.ecs_task.arn
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets = [aws_subnet.example_subnet.id]
-    security_groups = [aws_security_group.example_sg.id]
+    subnets = [aws_subnet.public_subnet.id]
+    security_groups = [aws_security_group.sg.id]
     assign_public_ip = true
   }
 
