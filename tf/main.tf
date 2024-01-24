@@ -49,25 +49,25 @@ resource "aws_route_table_association" "public_association" {
   route_table_id = aws_route_table.public_rt.id
 }
 
-resource "aws_subnet" "private_subnet" {
-  depends_on = [aws_subnet.public_subnet]
+# resource "aws_subnet" "private_subnet" {
+#   depends_on = [aws_subnet.public_subnet]
 
-  count = var.desired_count
+#   count = var.desired_count
 
-  vpc_id            = aws_vpc.vpc.id
-  availability_zone = data.aws_availability_zones.azs.names[count.index]
-  cidr_block        = local.private_subnets[count.index]
+#   vpc_id            = aws_vpc.vpc.id
+#   availability_zone = data.aws_availability_zones.azs.names[count.index]
+#   cidr_block        = local.private_subnets[count.index]
 
-  tags = {
-    Name = "${var.project_name}-private-subnet-${count.index}"
-  }
-}
+#   tags = {
+#     Name = "${var.project_name}-private-subnet-${count.index}"
+#   }
+# }
 
-resource "aws_route_table_association" "private_association" {
-  count          = var.desired_count
-  subnet_id      = aws_subnet.private_subnet[count.index].id
-  route_table_id = aws_route_table.public_rt.id
-}
+# resource "aws_route_table_association" "private_association" {
+#   count          = var.desired_count
+#   subnet_id      = aws_subnet.private_subnet[count.index].id
+#   route_table_id = aws_route_table.public_rt.id
+# }
 
 data "aws_ecr_repository" "nginx" {
   name = "${var.project_name}-nginx"
@@ -185,7 +185,7 @@ resource "aws_ecs_service" "fargate_service" {
   desired_count = var.desired_count
 
   network_configuration {
-    subnets         = flatten([aws_subnet.private_subnet[*].id, aws_subnet.public_subnet[*].id])
+    subnets         = flatten([aws_subnet.public_subnet[*].id, aws_subnet.public_subnet[*].id])
     security_groups = [aws_security_group.allow_all.id]
   }
 
