@@ -121,3 +121,9 @@ resource "aws_ecs_service" "fargate_service" {
 
   desired_count = 1
 }
+
+resource "aws_alb" "alb" {
+  name            = "${var.project_name}-alb"
+  security_groups = [aws_security_group.sg.id]
+  subnets         = aws_subnet.public_subnet.*.id
+}
