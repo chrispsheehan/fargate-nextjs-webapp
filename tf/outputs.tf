@@ -1,5 +1,5 @@
 output "ecr-repo-url" {
-  value = aws_ecr_repository.nginx.repository_url
+  value = data.aws_ecr_repository.nginx.repository_url
 }
 
 output "service-url" {

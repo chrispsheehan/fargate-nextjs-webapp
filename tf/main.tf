@@ -151,7 +151,7 @@ resource "aws_ecs_task_definition" "fargate_task" {
   container_definitions = jsonencode([
     {
       name  = "${var.project_name}-container"
-      image = "${aws_ecr_repository.nginx.repository_url}:${var.image_tag}"
+      image = "${data.aws_ecr_repository.nginx.repository_url}:${var.image_tag}"
       portMappings = [
         {
           containerPort = var.container_port
