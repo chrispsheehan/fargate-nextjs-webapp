@@ -16,16 +16,6 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-resource "aws_subnet" "public_subnet" {
-  vpc_id            = aws_vpc.vpc.id
-  cidr_block        = "10.0.1.0/24"
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = "${var.project_name}-subnet"
-  }
-}
-
 resource "aws_route_table" "rt" {
   vpc_id = aws_vpc.vpc.id
 
@@ -38,6 +28,18 @@ resource "aws_route_table" "rt" {
     Name = "${var.project_name}-rt"
   }
 }
+
+resource "aws_subnet" "public_subnet" {
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = "10.0.1.0/24"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "${var.project_name}-subnet"
+  }
+}
+
+
 
 resource "aws_route_table_association" "rta" {
   subnet_id      = aws_subnet.public_subnet.id
