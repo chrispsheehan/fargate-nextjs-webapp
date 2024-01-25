@@ -1,13 +1,4 @@
-FROM node:20
-
-WORKDIR /app  
-
-COPY ./src /app
-
-RUN npm i
-
-RUN npm run build --prefix /app
-
-EXPOSE 3000  
-
-CMD ["npm", "start"]
+FROM nginx:mainline-alpine
+RUN rm /etc/nginx/conf.d/*
+ADD src/helloworld.conf /etc/nginx/conf.d/
+ADD src/index.html /usr/share/nginx/html/

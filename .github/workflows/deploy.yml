@@ -39,10 +39,10 @@ jobs:
         shell: bash
         id: action
         run: |
+            docker build . -t test-nginx
             cd tf
             terraform apply -auto-approve --replace=aws_ecs_task_definition.fargate_task
             ECR_URL=$(terraform output -raw ecr-repo-url)
             aws ecr get-login-password --region ${{ env.aws_region }} | docker login --username AWS --password-stdin ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.aws_region }}.amazonaws.com
-            docker pull nginx:latest
-            docker tag nginx:latest $ECR_URL:latest
+            docker tag test-nginx $ECR_URL:latest
             docker push $ECR_URL:latest

@@ -124,6 +124,43 @@ resource "aws_ecs_service" "fargate_service" {
 
 resource "aws_alb" "alb" {
   name            = "${var.project_name}-alb"
+  internal           = false
+  load_balancer_type = "application"
+
+  enable_deletion_protection = false
+
   security_groups = [aws_security_group.sg.id]
   subnets         = aws_subnet.public_subnet.*.id
+}
+
+resource "aws_lb_listener" "listener" {
+  load_balancer_arn = aws_alb.alb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.example.arn
+  }
+}
+
+resource "aws_lb_target_group" "example" {
+  depends_on = [aws_alb.alb]
+
+  name        = "${var.project_name}-tg"
+  port        = var.container_port
+  protocol    = "HTTP"
+  target_type = "ip"
+
+  vpc_id      = aws_vpc.vpc.id
+
+  health_check {
+    path                = "/health"  # Replace with your health check path
+    protocol            = "HTTP"
+    port                = var.container_port
+    interval            = 5
+    timeout             = 2
+    healthy_threshold   = 5
+    unhealthy_threshold = 5
+  }
 }
