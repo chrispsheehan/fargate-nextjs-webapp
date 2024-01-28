@@ -1,27 +1,9 @@
-resource "aws_vpc" "vpc" {
-  cidr_block           = var.vpc_cidr_block
-  enable_dns_support   = true
-  enable_dns_hostnames = true
-
-  tags = {
-    Name = "${var.project_name}-vpc"
-  }
-}
-
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.vpc.id
-
-  tags = {
-    Name = "${var.project_name}-igw"
-  }
-}
-
 resource "aws_route_table" "rt" {
-  vpc_id = aws_vpc.vpc.id
+  vpc_id = data.aws_vpc.vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw.id
+    gateway_id = data.aws_internet_gateway.igw.id
   }
 
   tags = {
@@ -32,10 +14,10 @@ resource "aws_route_table" "rt" {
 resource "aws_subnet" "public_subnet" {
   count = local.az_count
 
-  vpc_id                  = aws_vpc.vpc.id
-  availability_zone       = data.aws_availability_zones.azs.names[count.index]
-  cidr_block              = local.subnets[count.index]
-  map_public_ip_on_launch = true
+  vpc_id            = data.aws_vpc.vpc.id
+  availability_zone = data.aws_availability_zones.azs.names[count.index]
+  cidr_block        = cidrsubnet(data.aws_vpc.vpc.cidr_block, 8, local.az_count + count.index)
+
 
   tags = {
     Name = "${var.project_name}-public-subnet-${count.index}"
@@ -43,124 +25,190 @@ resource "aws_subnet" "public_subnet" {
 }
 
 resource "aws_route_table_association" "public_association" {
-  count          = local.az_count
+  count = local.az_count
 
   subnet_id      = aws_subnet.public_subnet[count.index].id
   route_table_id = aws_route_table.rt.id
 }
 
-resource "aws_security_group" "sg" {
-  vpc_id = aws_vpc.vpc.id
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "${var.project_name}-sg"
-  }
+resource "aws_main_route_table_association" "public_main" {
+  vpc_id         = data.aws_vpc.vpc.id
+  route_table_id = aws_route_table.rt.id
 }
 
-resource "aws_ecs_cluster" "ecs" {
-  name = "${var.project_name}-ecs"
+resource "aws_ecs_cluster" "cluster" {
+  name = "${var.project_name}-cluster"
 }
 
-resource "aws_iam_role" "ecs_execution_role" {
-  name = "${local.formatted_name}_ecs_execution_role"
-
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
-}
-
-resource "aws_iam_role_policy_attachment" "ecs_execution_role_attachment" {
-  # policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
-  role       = aws_iam_role.ecs_execution_role.name
-}
-
-resource "aws_ecs_task_definition" "ecs_task" {
-  family                   = "${var.project_name}-task"
+resource "aws_ecs_task_definition" "nginx_task" {
+  family                   = "${var.project_name}-task-2"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = "256"
-  memory                   = "512"
+  cpu                      = "1024"
+  memory                   = "3072"
 
-  execution_role_arn = aws_iam_role.ecs_execution_role.arn
-  task_role_arn      = aws_iam_role.ecs_execution_role.arn
+  task_role_arn = "arn:aws:iam::700060376888:role/ecsTaskExecutionRole"
+  execution_role_arn = "arn:aws:iam::700060376888:role/ecsTaskExecutionRole"
+
+  runtime_platform {
+    cpu_architecture        = "X86_64"
+    operating_system_family = "LINUX"
+  }
 
   container_definitions = jsonencode([{
-    name  = "nginx",
-    image = "${data.aws_ecr_repository.nginx.repository_url}:latest",
-    portMappings = [{
-      containerPort = 80,
-      hostPort      = 80
-    }]
-  }])
+    name: "nginx",
+    image: "nginx",
+    cpu: 0,
+    portMappings: [
+      {
+          name: "nginx-80-tcp",
+          containerPort: 80,
+          hostPort: 80,
+          protocol: "tcp",
+          appProtocol: "http"
+      }
+    ],
+    essential: true,
+    environment: [],
+    environmentFiles: [],
+    mountPoints: [],
+    volumesFrom: [],
+    ulimits: [],
+    logConfiguration: {
+      logDriver: "awslogs",
+      options: {
+          awslogs-create-group: "true",
+          awslogs-group: "/ecs/",
+          awslogs-region: "eu-west-2",
+          awslogs-stream-prefix: "ecs"
+      },
+      secretOptions: []
+      }
+    }
+  ])
 }
 
-resource "aws_ecs_service" "fargate_service" {
-  name            = "${var.project_name}-service"
-  cluster         = aws_ecs_cluster.ecs.id
-  task_definition = aws_ecs_task_definition.ecs_task.arn
-  launch_type     = "FARGATE"
+# resource "aws_security_group" "sg" {
+#   vpc_id = data.aws_vpc.vpc.id
 
-  network_configuration {
-    subnets          = aws_subnet.public_subnet.*.id
-    security_groups  = [aws_security_group.sg.id]
-    assign_public_ip = true
-  }
+#   ingress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
 
-  desired_count = 1
-}
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
 
-resource "aws_alb" "alb" {
-  name            = "${var.project_name}-alb"
-  internal           = false
-  load_balancer_type = "application"
+#   tags = {
+#     Name = "${var.project_name}-sg"
+#   }
+# }
 
-  enable_deletion_protection = false
+# resource "aws_iam_role" "ecs_task_execution_role" {
+#   name               = "${local.formatted_name}_ECS_TaskExecutionRole"
+#   assume_role_policy = data.aws_iam_policy_document.task_assume_role_policy.json
+# }
 
-  security_groups = [aws_security_group.sg.id]
-  subnets         = aws_subnet.public_subnet.*.id
-}
+# data "aws_iam_policy_document" "task_assume_role_policy" {
+#   statement {
+#     actions = ["sts:AssumeRole"]
 
-resource "aws_lb_listener" "listener" {
-  load_balancer_arn = aws_alb.alb.arn
-  port              = 80
-  protocol          = "HTTP"
+#     principals {
+#       type        = "Service"
+#       identifiers = ["ecs-tasks.amazonaws.com"]
+#     }
+#   }
+# }
 
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.example.arn
-  }
-}
+# resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
+#   role       = aws_iam_role.ecs_task_execution_role.name
+#   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+# }
 
-resource "aws_lb_target_group" "example" {
-  depends_on = [aws_alb.alb]
+# ########################################################################################################################
+# ## IAM Role for ECS Task
+# ########################################################################################################################
 
-  name        = "${var.project_name}-tg"
-  port        = var.container_port
-  protocol    = "HTTP"
-  target_type = "ip"
+# resource "aws_iam_role" "ecs_task_iam_role" {
+#   name               = "${local.formatted_name}_ECS_TaskIAMRole"
+#   assume_role_policy = data.aws_iam_policy_document.task_assume_role_policy.json
+# }
 
-  vpc_id      = aws_vpc.vpc.id
+# resource "aws_ecs_task_definition" "ecs_task" {
+#   family                   = "${var.project_name}-task"
+#   network_mode             = "awsvpc"
+#   requires_compatibilities = ["FARGATE"]
+#   cpu                      = "1024"
+#   memory                   = "2048"
 
-  health_check {
-    path                = "/health"  # Replace with your health check path
-    protocol            = "HTTP"
-    port                = var.container_port
-    interval            = 5
-    timeout             = 2
-    healthy_threshold   = 5
-    unhealthy_threshold = 5
-  }
-}
+#   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+#   task_role_arn      = aws_iam_role.ecs_task_iam_role.arn
+
+#   runtime_platform {
+#     operating_system_family = "LINUX"
+#   }
+
+#   container_definitions = jsonencode([{
+#     name  = "test-e",
+#     image = "700060376888.dkr.ecr.eu-west-2.amazonaws.com/fargate-nextjs-webapp-nginx:teste",
+#     cpu = 1024
+#     memory = 2048
+#     essential = true
+#     portMappings = [{
+#       containerPort = 3000
+#       hostPort = 3000
+#       protocol      = "tcp"
+#     }]
+#   }])
+# }
+
+# resource "aws_alb" "alb" {
+#   name            = "${var.project_name}-alb"
+#   internal           = false
+#   load_balancer_type = "application"
+
+#   enable_deletion_protection = false
+
+#   security_groups = [aws_security_group.sg.id]
+#   subnets         = aws_subnet.public_subnet.*.id
+# }
+
+# resource "aws_alb_listener" "listener" {
+#   load_balancer_arn = aws_alb.alb.arn
+#   port              = 80
+#   protocol          = "HTTP"
+
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_alb_target_group.example.arn
+#   }
+# }
+
+# resource "aws_alb_target_group" "example" {
+#   depends_on = [aws_alb.alb]
+
+#   name        = "${var.project_name}-tg"
+#   port        = var.container_port
+#   protocol    = "HTTP"
+#   deregistration_delay = 5
+#   target_type = "ip"
+
+#   vpc_id      = aws_vpc.vpc.id
+
+#   health_check {
+#     healthy_threshold   = 2
+#     unhealthy_threshold = 2
+#     interval            = 60
+#     matcher             = 200
+#     path                = "/"
+#     port                = "traffic-port"
+#     protocol            = "HTTP"
+#     timeout             = 30
+#   }
+# }

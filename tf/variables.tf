@@ -4,12 +4,6 @@ variable "region" {
   default     = "eu-west-2"
 }
 
-variable "vpc_cidr_block" {
-  description = "Fargate vpc"
-  type        = string
-  default     = "10.0.0.0/16"
-}
-
 variable "project_name" {
   type    = string
   default = "fargate-nextjs-webapp"
