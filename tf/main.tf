@@ -88,27 +88,51 @@ resource "aws_ecs_task_definition" "nginx_task" {
   ])
 }
 
-# resource "aws_security_group" "sg" {
-#   vpc_id = data.aws_vpc.vpc.id
+resource "aws_security_group" "sg" {
+  vpc_id = data.aws_vpc.vpc.id
 
-#   ingress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-#   tags = {
-#     Name = "${var.project_name}-sg"
-#   }
-# }
+  tags = {
+    Name = "${var.project_name}-sg"
+  }
+}
+
+resource "aws_ecs_service" "nginx" {
+  name            = "${var.project_name}-service"
+  launch_type = "FARGATE"
+  cluster         = aws_ecs_cluster.cluster.id
+  task_definition = aws_ecs_task_definition.nginx_task.arn
+  desired_count   = 3
+  wait_for_steady_state = true
+
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
+
+  deployment_controller {
+    type = "ECS"
+  }
+
+  network_configuration {
+    assign_public_ip = true
+    security_groups  = [aws_security_group.sg.id]
+    subnets          = aws_subnet.public_subnet.*.id
+  }
+}
 
 # resource "aws_iam_role" "ecs_task_execution_role" {
 #   name               = "${local.formatted_name}_ECS_TaskExecutionRole"
