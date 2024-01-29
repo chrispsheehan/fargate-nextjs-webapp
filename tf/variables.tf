@@ -1,13 +1,16 @@
 variable "region" {
   type        = string
-  description = "The AWS Region to use"
   default     = "eu-west-2"
 }
 
-variable "vpc_cidr_block" {
-  description = "Fargate vpc"
-  type        = string
-  default     = "10.0.0.0/16"
+variable "desired_count" {
+  description = "number of containers the load balancer will point to"
+  default = 2
+}
+
+variable "max_az" {
+  description = "limit the amount of azs"
+  default = 3
 }
 
 variable "project_name" {
@@ -38,8 +41,4 @@ variable "container_port" {
 variable "host_port" {
   type    = number
   default = 80
-}
-
-variable "desired_count" {
-  default = 2
 }
