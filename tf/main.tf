@@ -47,8 +47,8 @@ resource "aws_ecs_task_definition" "nginx_task" {
   cpu                      = "1024"
   memory                   = "3072"
 
-  task_role_arn      = "arn:aws:iam::700060376888:role/ecsTaskExecutionRole"
-  execution_role_arn = "arn:aws:iam::700060376888:role/ecsTaskExecutionRole"
+  task_role_arn      = data.aws_iam_role.ecs_task_role.arn
+  execution_role_arn = data.aws_iam_role.ecs_task_role.arn
 
   runtime_platform {
     cpu_architecture        = "X86_64"
@@ -79,7 +79,7 @@ resource "aws_ecs_task_definition" "nginx_task" {
       options : {
         awslogs-create-group : "true",
         awslogs-group : "/ecs/",
-        awslogs-region : "eu-west-2",
+        awslogs-region : "${var.region}",
         awslogs-stream-prefix : "ecs"
       },
       secretOptions : []
@@ -117,7 +117,7 @@ resource "aws_ecs_service" "nginx" {
   launch_type           = "FARGATE"
   cluster               = aws_ecs_cluster.cluster.id
   task_definition       = aws_ecs_task_definition.nginx_task.arn
-  desired_count         = 3
+  desired_count         = var.desired_count
   wait_for_steady_state = true
 
   deployment_circuit_breaker {
@@ -144,8 +144,8 @@ resource "aws_ecs_service" "nginx" {
 
 resource "aws_lb_target_group" "example" {
   depends_on = [aws_lb.lb]
-  
-  name     = "example-target-group"
+
+  name     = "${var.project_name}-target-group"
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.vpc.id
@@ -165,7 +165,7 @@ resource "aws_lb_listener" "example_listener" {
 }
 
 resource "aws_lb" "lb" {
-  name               = "example-load-balancer"
+  name               = "${var.project_name}-load-balancer"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg.id]
