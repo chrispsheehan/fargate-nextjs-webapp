@@ -111,7 +111,7 @@ resource "aws_security_group" "sg" {
 }
 
 resource "aws_ecs_service" "nginx" {
-  # depends_on = [aws_lb.lb]
+  depends_on = [aws_lb.lb]
 
   name                  = "${var.project_name}-service"
   launch_type           = "FARGATE"
@@ -143,6 +143,8 @@ resource "aws_ecs_service" "nginx" {
 }
 
 resource "aws_lb_target_group" "example" {
+  depends_on = [aws_lb.lb]
+  
   name     = "example-target-group"
   port     = 80
   protocol = "HTTP"
