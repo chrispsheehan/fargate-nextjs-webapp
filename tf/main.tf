@@ -86,7 +86,7 @@ resource "aws_lb_target_group" "tg" {
   target_type = "ip"
 }
 
-resource "aws_ecs_task_definition" "fargate_task" {
+resource "aws_ecs_task_definition" "task" {
   family                   = "${var.project_name}-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
@@ -101,15 +101,17 @@ resource "aws_ecs_task_definition" "fargate_task" {
     operating_system_family = "LINUX"
   }
 
+    # image : "${aws_ecr_repository.ecr.repository_url}:${var.image_tag}",
+
   container_definitions = jsonencode([{
-    name : "${var.project_name}",
-    image : "${aws_ecr_repository.ecr.repository_url}:${var.image_tag}",
+    name : "nextjs-app",
+    image : "nginx",
     cpu : 0,
     portMappings : [
       {
-        name : "${var.project_name}-${var.container_port}-tcp",
-        containerPort : var.container_port,
-        hostPort : var.host_port,
+        name : "nginx-80-tcp",
+        containerPort : 80,
+        hostPort : 80,
         protocol : "tcp",
         appProtocol : "http"
       }
@@ -124,7 +126,7 @@ resource "aws_ecs_task_definition" "fargate_task" {
       logDriver : "awslogs",
       options : {
         awslogs-create-group : "true",
-        awslogs-group : "/ecs/${var.project_name}/",
+        awslogs-group : "/ecs/",
         awslogs-region : "${var.region}",
         awslogs-stream-prefix : "ecs"
       },
@@ -134,13 +136,13 @@ resource "aws_ecs_task_definition" "fargate_task" {
   ])
 }
 
-resource "aws_ecs_service" "nginx" {
+resource "aws_ecs_service" "ecs" {
   depends_on = [aws_lb.lb]
 
-  name                  = "${var.project_name}-service"
+  name                  = var.project_name
   launch_type           = "FARGATE"
   cluster               = aws_ecs_cluster.cluster.id
-  task_definition       = aws_ecs_task_definition.fargate_task.arn
+  task_definition       = aws_ecs_task_definition.task.arn
   desired_count         = var.desired_count
   wait_for_steady_state = true
 
@@ -175,14 +177,4 @@ resource "aws_lb_listener" "listener" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tg.arn
   }
-}
-
-resource "aws_lb" "lb" {
-  name               = "${var.project_name}-lb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.sg.id]
-  subnets            = aws_subnet.public_subnet.*.id
-
-  enable_deletion_protection = false
 }
