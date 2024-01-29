@@ -47,7 +47,7 @@ resource "aws_ecr_repository" "ecr" {
 
 resource "aws_security_group" "sg" {
   vpc_id = data.aws_vpc.vpc.id
-  name = "${var.project_name}-sg"
+  name   = "${var.project_name}-sg"
 
   ingress {
     from_port   = 0
@@ -101,39 +101,10 @@ resource "aws_ecs_task_definition" "task" {
     operating_system_family = "LINUX"
   }
 
-    # image : "${aws_ecr_repository.ecr.repository_url}:${var.image_tag}",
+  # image : "${aws_ecr_repository.ecr.repository_url}:${var.image_tag}",
+  # https://www.youtube.com/watch?v=IL1qPQLei2k
 
-  container_definitions = jsonencode([{
-    name : "nextjs-app",
-    image : "nginx",
-    cpu : 0,
-    portMappings : [
-      {
-        name : "nginx-80-tcp",
-        containerPort : 80,
-        hostPort : 80,
-        protocol : "tcp",
-        appProtocol : "http"
-      }
-    ],
-    essential : true,
-    environment : [],
-    environmentFiles : [],
-    mountPoints : [],
-    volumesFrom : [],
-    ulimits : [],
-    logConfiguration : {
-      logDriver : "awslogs",
-      options : {
-        awslogs-create-group : "true",
-        awslogs-group : "/ecs/",
-        awslogs-region : "${var.region}",
-        awslogs-stream-prefix : "ecs"
-      },
-      secretOptions : []
-    }
-    }
-  ])
+  container_definitions = local.container_definitions
 }
 
 resource "aws_ecs_service" "ecs" {
@@ -163,14 +134,14 @@ resource "aws_ecs_service" "ecs" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.tg.arn
-    container_name   = "${var.project_name}"
+    container_name   = var.project_name
     container_port   = var.container_port
   }
 }
 
 resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.lb.arn
-  port              = "${var.container_port}"
+  port              = var.container_port
   protocol          = "HTTP"
 
   default_action {

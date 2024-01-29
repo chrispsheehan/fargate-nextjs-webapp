@@ -1,16 +1,16 @@
 variable "region" {
-  type        = string
-  default     = "eu-west-2"
+  type    = string
+  default = "eu-west-2"
 }
 
 variable "desired_count" {
   description = "number of containers the load balancer will point to"
-  default = 2
+  default     = 2
 }
 
 variable "max_az" {
   description = "limit the amount of azs"
-  default = 3
+  default     = 3
 }
 
 variable "project_name" {
