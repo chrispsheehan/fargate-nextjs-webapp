@@ -46,10 +46,3 @@ runs:
         docker tag ${{ env.LOCAL_IMAGE }} ${{ env.ECR_URL }}:${{ env.IMAGE_TAG }}
         aws ecr get-login-password --region ${{ env.aws_region }} | docker login --username AWS --password-stdin ${{ env.ECR_BASE }}
         docker push ${{ env.ECR_URL }}:${{ env.IMAGE_TAG }}
-
-
-# 700060376888.dkr.ecr.eu-west-2.amazonaws.com/fargate-nextjs-webapp-nginx
-  #           aws ecr get-login-password --region ${{ env.aws_region }} | docker login --username AWS --password-stdin ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.aws_region }}.amazonaws.com
-  #           docker pull nginx:latest
-  #           docker tag nginx:latest $ECR_URL:latest
-  #           docker push $ECR_URL:latest
