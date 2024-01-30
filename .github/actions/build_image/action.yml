@@ -33,3 +33,20 @@ runs:
       shell: bash
       run: |
         bash bin/create_ecr_repo.sh
+
+    - name: Build
+      env:
+        LOCAL_IMAGE: ${{ github.event.repository.name }}:local
+        ECR_URL: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ inputs.aws_region }}.amazonaws.com/${{ github.event.repository.name }}
+        IMAGE_TAG: $(echo $GITHUB_SHA | cut -c 1-6)
+      shell: bash
+      run: |
+        docker build . -t $LOCAL_IMAGE
+        docker tag $LOCAL_IMAGE $ECR_URL:$IMAGE_TAG
+
+
+# 700060376888.dkr.ecr.eu-west-2.amazonaws.com/fargate-nextjs-webapp-nginx
+  #           aws ecr get-login-password --region ${{ env.aws_region }} | docker login --username AWS --password-stdin ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.aws_region }}.amazonaws.com
+  #           docker pull nginx:latest
+  #           docker tag nginx:latest $ECR_URL:latest
+  #           docker push $ECR_URL:latest
