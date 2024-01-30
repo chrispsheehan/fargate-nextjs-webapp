@@ -37,12 +37,14 @@ runs:
     - name: Build
       env:
         LOCAL_IMAGE: ${{ github.event.repository.name }}:local
-        ECR_URL: ${{ inputs.AWS_ACCOUNT_ID }}.dkr.ecr.${{ inputs.aws_region }}.amazonaws.com/${{ github.event.repository.name }}
+        ECR_BASE: ${{ inputs.AWS_ACCOUNT_ID }}.dkr.ecr.${{ inputs.aws_region }}.amazonaws.com
+        ECR_URL: ${{ env.ECR_BASE }}/${{ github.event.repository.name }}
         IMAGE_TAG: $(echo $GITHUB_SHA | cut -c 1-6)
       shell: bash
       run: |
         docker build . -t ${{ env.LOCAL_IMAGE }}
         docker tag ${{ env.LOCAL_IMAGE }} ${{ env.ECR_URL }}:${{ env.IMAGE_TAG }}
+        aws ecr get-login-password --region ${{ env.aws_region }} | docker login --username AWS --password-stdin ${{ env.ECR_BASE }}
         docker push ${{ env.ECR_URL }}:${{ env.IMAGE_TAG }}
 
 
