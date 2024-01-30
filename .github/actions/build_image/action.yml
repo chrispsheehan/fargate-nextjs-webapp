@@ -43,6 +43,7 @@ runs:
       run: |
         docker build . -t ${{ env.LOCAL_IMAGE }}
         docker tag ${{ env.LOCAL_IMAGE }} ${{ env.ECR_URL }}:${{ env.IMAGE_TAG }}
+        docker push ${{ env.ECR_URL }}:${{ env.IMAGE_TAG }}
 
 
 # 700060376888.dkr.ecr.eu-west-2.amazonaws.com/fargate-nextjs-webapp-nginx
