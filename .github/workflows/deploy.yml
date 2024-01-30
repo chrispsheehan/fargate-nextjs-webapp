@@ -32,6 +32,8 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    outputs:
+      site_url: ${{ steps.action.outputs.SITE_URL }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -56,3 +58,19 @@ jobs:
         run: |
             cd tf
             terraform apply -auto-approve -var project_name=${{ github.event.repository.name }} -var image_tag=$(echo $GITHUB_SHA | cut -c 1-6)
+            echo "SITE_URL=$(terraform output -raw service-url)" >> $GITHUB_OUTPUT
+
+  test:
+    needs: deploy
+    runs-on: ubuntu-latest
+    env:
+      SITE_URL: ${{ needs.deploy.outputs.site_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+            fetch-depth: 0
+
+      - name: Test
+        shell: bash
+        run: |
+          bash bin/curl-check.sh
