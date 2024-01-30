@@ -16,7 +16,7 @@ data "aws_availability_zones" "azs" {
 }
 
 data "aws_ecr_repository" "ecr" {
-  name                 = var.project_name
+  name = var.project_name
 }
 
 data "aws_iam_role" "ecs_task_role" {
@@ -35,3 +35,20 @@ data "aws_iam_policy_document" "assume_role" {
     actions = ["sts:AssumeRole"]
   }
 }
+
+data "aws_iam_policy_document" "ecr_policy" {
+  statement {
+    actions = [
+      "ecr:GetAuthorizationToken",
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:GetRepositoryPolicy",
+      "ecr:DescribeRepositories",
+      "ecr:ListImages",
+      "ecr:BatchGetImage"
+    ]
+
+    resources = [data.aws_ecr_repository.ecr.arn]
+  }
+}
+

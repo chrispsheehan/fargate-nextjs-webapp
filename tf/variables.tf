@@ -14,7 +14,7 @@ variable "max_az" {
 }
 
 variable "project_name" {
-  type    = string
+  type = string
 }
 
 variable "image_tag" {
