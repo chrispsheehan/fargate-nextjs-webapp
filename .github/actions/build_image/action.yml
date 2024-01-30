@@ -29,7 +29,7 @@ runs:
     - name: Setup aws ECR
       env:
         REPO_NAME: ${{ github.event.repository.name }}
-        AWS_REGION: ${{ github.event.aws_region }}
+        AWS_REGION: ${{ inputs.aws_region }}
       shell: bash
       run: |
         bash bin/create_ecr_repo.sh
