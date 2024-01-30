@@ -41,8 +41,8 @@ runs:
         IMAGE_TAG: $(echo $GITHUB_SHA | cut -c 1-6)
       shell: bash
       run: |
-        docker build . -t $LOCAL_IMAGE
-        docker tag $LOCAL_IMAGE $ECR_URL:$IMAGE_TAG
+        docker build . -t ${{ env.LOCAL_IMAGE }}
+        docker tag ${{ env.LOCAL_IMAGE }} ${{ env.ECR_URL }}:${{ env.IMAGE_TAG }}
 
 
 # 700060376888.dkr.ecr.eu-west-2.amazonaws.com/fargate-nextjs-webapp-nginx
