@@ -15,7 +15,6 @@ variable "max_az" {
 
 variable "project_name" {
   type    = string
-  default = "nextjs-app"
 }
 
 variable "image_tag" {
