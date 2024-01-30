@@ -32,4 +32,4 @@ runs:
         AWS_REGION: ${{ github.event.aws_region }}
       shell: bash
       run: |
-        bash bin/create-s3-bucket.sh
+        bash bin/create_ecr_repo.sh
