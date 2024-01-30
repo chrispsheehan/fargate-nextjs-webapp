@@ -37,7 +37,7 @@ runs:
     - name: Build
       env:
         LOCAL_IMAGE: ${{ github.event.repository.name }}:local
-        ECR_URL: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ inputs.aws_region }}.amazonaws.com/${{ github.event.repository.name }}
+        ECR_URL: ${{ inputs.AWS_ACCOUNT_ID }}.dkr.ecr.${{ inputs.aws_region }}.amazonaws.com/${{ github.event.repository.name }}
         IMAGE_TAG: $(echo $GITHUB_SHA | cut -c 1-6)
       shell: bash
       run: |
