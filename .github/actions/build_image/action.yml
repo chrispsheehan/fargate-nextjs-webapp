@@ -1,0 +1,35 @@
+name: Build and push image
+
+inputs:
+  aws_account_id:
+    description: 'AWS account id'
+    required: true
+  aws_region:
+    description: 'AWS region'
+    required: true
+  aws_role:
+    description: 'AWS role to assume'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: ${{ inputs.aws_region }}
+        role-to-assume: arn:aws:iam::${{ inputs.aws_account_id }}:role/${{ inputs.aws_role }}
+        role-session-name: GitHubActions
+
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup aws ECR
+      env:
+        REPO_NAME: ${{ github.event.repository.name }}
+        AWS_REGION: ${{ github.event.aws_region }}
+      shell: bash
+      run: |
+        bash bin/create-s3-bucket.sh

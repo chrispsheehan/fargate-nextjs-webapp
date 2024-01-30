@@ -15,34 +15,48 @@ permissions:
   contents: read
       
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
             fetch-depth: 0
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Build image
+        uses: ./.github/actions/build_image
         with:
-            aws-region: ${{ env.aws_region }}
-            role-to-assume: arn:aws:iam::${{ env.aws_account_id }}:role/${{ env.aws_role }}
-            role-session-name: GitHubActions
+          aws_account_id: ${{ env.aws_account_id }}
+          aws_region: ${{ env.aws_region }}
+          aws_role: ${{ env.aws_role }}
 
-      - name: Init
-        shell: bash
-        run: |
-            cd tf
-            terraform init
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #           fetch-depth: 0
+
+  #     - name: Configure AWS Credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #           aws-region: ${{ env.aws_region }}
+  #           role-to-assume: arn:aws:iam::${{ env.aws_account_id }}:role/${{ env.aws_role }}
+  #           role-session-name: GitHubActions
+
+  #     - name: Init
+  #       shell: bash
+  #       run: |
+  #           cd tf
+  #           terraform init
     
-      - name: Action
-        shell: bash
-        id: action
-        run: |
-            cd tf
-            terraform apply -auto-approve --replace=aws_ecs_service.fargate_service
-            ECR_URL=$(terraform output -raw ecr-repo-url)
-            aws ecr get-login-password --region ${{ env.aws_region }} | docker login --username AWS --password-stdin ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.aws_region }}.amazonaws.com
-            docker pull nginx:latest
-            docker tag nginx:latest $ECR_URL:latest
-            docker push $ECR_URL:latest
+  #     - name: Action
+  #       shell: bash
+  #       id: action
+  #       run: |
+  #           cd tf
+  #           terraform apply -auto-approve
+  #           ECR_URL=$(terraform output -raw ecr-url)
+  #           aws ecr get-login-password --region ${{ env.aws_region }} | docker login --username AWS --password-stdin ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.aws_region }}.amazonaws.com
+  #           docker pull nginx:latest
+  #           docker tag nginx:latest $ECR_URL:latest
+  #           docker push $ECR_URL:latest
