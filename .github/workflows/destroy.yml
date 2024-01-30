@@ -1,4 +1,4 @@
-name: Destroy Environment
+name: Destroy
 
 on:
   workflow_dispatch:
@@ -38,4 +38,4 @@ jobs:
         id: action
         run: |
             cd tf
-            terraform destroy -var project_name=${{ github.event.repository.name }} -var image_tag=none
+            terraform destroy -auto-approve -var project_name=${{ github.event.repository.name }} -var image_tag=none

@@ -1,9 +1,9 @@
 name: Deploy
 
 on:
-    push:
-        branches:
-            - main
+  push:
+    branches:
+      - main
 
 env:
   aws_account_id: ${{ vars.AWS_ACCOUNT_ID }}
