@@ -35,10 +35,10 @@ variable "memory" {
 
 variable "container_port" {
   type    = number
-  default = 80
+  default = 3000
 }
 
 variable "host_port" {
   type    = number
-  default = 80
+  default = 3000
 }

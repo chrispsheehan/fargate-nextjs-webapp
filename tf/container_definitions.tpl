@@ -1,13 +1,13 @@
 [
     {
         "name": "${container_name}",
-        "image": "nginx",
+        "image": "${image_uri}",
         "cpu": 0,
         "portMappings": [
             {
-                "name": "nginx-80-tcp",
-                "containerPort": 80,
-                "hostPort": 80,
+                "name": "${container_name}-${container_port}-tcp",
+                "containerPort": ${container_port},
+                "hostPort": ${host_port},
                 "protocol": "tcp",
                 "appProtocol": "http"
             }

@@ -40,11 +40,6 @@ resource "aws_ecs_cluster" "cluster" {
   name = "${var.project_name}-cluster"
 }
 
-resource "aws_ecr_repository" "ecr" {
-  name                 = var.project_name
-  image_tag_mutability = "MUTABLE"
-}
-
 resource "aws_security_group" "sg" {
   vpc_id = data.aws_vpc.vpc.id
   name   = "${var.project_name}-sg"
@@ -100,9 +95,6 @@ resource "aws_ecs_task_definition" "task" {
     cpu_architecture        = "X86_64"
     operating_system_family = "LINUX"
   }
-
-  # image : "${aws_ecr_repository.ecr.repository_url}:${var.image_tag}",
-  # https://www.youtube.com/watch?v=IL1qPQLei2k
 
   container_definitions = local.container_definitions
 }

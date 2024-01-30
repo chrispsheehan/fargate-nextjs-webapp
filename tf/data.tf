@@ -15,6 +15,10 @@ data "aws_availability_zones" "azs" {
   state = "available"
 }
 
+data "aws_ecr_repository" "ecr" {
+  name                 = var.project_name
+}
+
 data "aws_iam_role" "ecs_task_role" {
   name = "ecsTaskExecutionRole"
 }
