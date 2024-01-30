@@ -30,6 +30,7 @@ jobs:
           aws_role: ${{ env.aws_role }}
 
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
