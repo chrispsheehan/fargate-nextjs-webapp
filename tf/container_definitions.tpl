@@ -2,7 +2,8 @@
     {
         "name": "${container_name}",
         "image": "${image_uri}",
-        "cpu": 0,
+        "cpu": ${cpu},
+        "memory": ${memory},
         "portMappings": [
             {
                 "name": "${container_name}-${container_port}-tcp",

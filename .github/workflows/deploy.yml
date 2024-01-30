@@ -54,9 +54,4 @@ jobs:
   #       id: action
   #       run: |
   #           cd tf
-  #           terraform apply -auto-approve
-  #           ECR_URL=$(terraform output -raw ecr-url)
-  #           aws ecr get-login-password --region ${{ env.aws_region }} | docker login --username AWS --password-stdin ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.aws_region }}.amazonaws.com
-  #           docker pull nginx:latest
-  #           docker tag nginx:latest $ECR_URL:latest
-  #           docker push $ECR_URL:latest
+  #           terraform apply -auto-approve -var project_name=${{ github.event.repository.name }} -var image_tag=$(echo $GITHUB_SHA | cut -c 1-6)
