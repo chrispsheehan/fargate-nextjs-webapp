@@ -29,29 +29,29 @@ jobs:
           aws_region: ${{ env.aws_region }}
           aws_role: ${{ env.aws_role }}
 
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       with:
-  #           fetch-depth: 0
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+            fetch-depth: 0
 
-  #     - name: Configure AWS Credentials
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #           aws-region: ${{ env.aws_region }}
-  #           role-to-assume: arn:aws:iam::${{ env.aws_account_id }}:role/${{ env.aws_role }}
-  #           role-session-name: GitHubActions
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+            aws-region: ${{ env.aws_region }}
+            role-to-assume: arn:aws:iam::${{ env.aws_account_id }}:role/${{ env.aws_role }}
+            role-session-name: GitHubActions
 
-  #     - name: Init
-  #       shell: bash
-  #       run: |
-  #           cd tf
-  #           terraform init
+      - name: Init
+        shell: bash
+        run: |
+            cd tf
+            terraform init
     
-  #     - name: Action
-  #       shell: bash
-  #       id: action
-  #       run: |
-  #           cd tf
-  #           terraform apply -auto-approve -var project_name=${{ github.event.repository.name }} -var image_tag=$(echo $GITHUB_SHA | cut -c 1-6)
+      - name: Action
+        shell: bash
+        id: action
+        run: |
+            cd tf
+            terraform apply -auto-approve -var project_name=${{ github.event.repository.name }} -var image_tag=$(echo $GITHUB_SHA | cut -c 1-6)
