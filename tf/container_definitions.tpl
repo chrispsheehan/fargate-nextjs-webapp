@@ -8,7 +8,7 @@
             {
                 "name": "${container_name}-${container_port}-tcp",
                 "containerPort": ${container_port},
-                "hostPort": ${host_port},
+                "hostPort": ${container_port},
                 "protocol": "tcp",
                 "appProtocol": "http"
             }

@@ -37,7 +37,7 @@ variable "container_port" {
   default = 3000
 }
 
-variable "host_port" {
+variable "load_balancer_port" {
   type    = number
-  default = 3000
+  default = 80
 }

@@ -143,7 +143,7 @@ resource "aws_ecs_service" "ecs" {
 
 resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.lb.arn
-  port              = 80
+  port              = var.load_balancer_port
   protocol          = "HTTP"
 
   default_action {

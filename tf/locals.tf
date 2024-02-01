@@ -5,7 +5,6 @@ locals {
     container_name = var.project_name
     image_uri      = "${data.aws_ecr_repository.ecr.repository_url}:${var.image_tag}"
     container_port = var.container_port
-    host_port      = var.host_port
     cpu            = var.cpu
     memory         = var.memory
   })
