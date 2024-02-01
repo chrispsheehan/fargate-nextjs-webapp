@@ -81,14 +81,9 @@ resource "aws_lb_target_group" "tg" {
   target_type = "ip"
 }
 
-resource "aws_iam_policy" "ecr_access_policy" {
-  name   = "${local.formatted_name}_ecr_access_policy"
-  policy = data.aws_iam_policy_document.ecr_policy.json
-}
-
-resource "aws_iam_role_policy_attachment" "ecr_access_policy_attachment" {
-  role       = data.aws_iam_role.ecs_task_role.name
-  policy_arn = aws_iam_policy.ecr_access_policy.arn
+resource "aws_iam_role" "ecr_role" {
+  name = "${local.formatted_name}_ecr__role"
+  assume_role_policy = data.aws_iam_policy_document.ecr_policy.json
 }
 
 resource "aws_ecs_task_definition" "task" {
@@ -98,8 +93,8 @@ resource "aws_ecs_task_definition" "task" {
   cpu                      = var.cpu
   memory                   = var.memory
 
-  task_role_arn      = data.aws_iam_role.ecs_task_role.arn
-  execution_role_arn = data.aws_iam_role.ecs_task_role.arn
+  task_role_arn      = aws_iam_role.ecr_role.arn
+  execution_role_arn = aws_iam_role.ecr_role.arn
 
   runtime_platform {
     cpu_architecture        = "X86_64"

@@ -19,10 +19,6 @@ data "aws_ecr_repository" "ecr" {
   name = var.project_name
 }
 
-data "aws_iam_role" "ecs_task_role" {
-  name = "ecsTaskExecutionRole"
-}
-
 data "aws_iam_policy_document" "assume_role" {
   statement {
     effect = "Allow"
