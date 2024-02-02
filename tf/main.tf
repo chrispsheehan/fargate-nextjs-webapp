@@ -40,47 +40,6 @@ resource "aws_ecs_cluster" "cluster" {
   name = "${var.project_name}-cluster"
 }
 
-resource "aws_security_group" "sg" {
-  vpc_id = data.aws_vpc.vpc.id
-  name   = "${var.project_name}-sg"
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_lb" "lb" {
-  name               = "${var.project_name}-lb"
-  internal           = false
-  load_balancer_type = "application"
-
-  enable_deletion_protection = false
-
-  security_groups = [aws_security_group.sg.id]
-  subnets         = aws_subnet.public_subnet[*].id
-}
-
-resource "aws_lb_target_group" "tg" {
-  depends_on = [aws_lb.lb]
-
-  name     = "${var.project_name}-tg"
-  port     = var.container_port
-  protocol = "HTTP"
-  vpc_id   = data.aws_vpc.vpc.id
-
-  target_type = "ip"
-}
-
 resource "aws_iam_policy" "ecr_access_policy" {
   name   = "${local.formatted_name}_ecr_access_policy"
   policy = data.aws_iam_policy_document.ecr_policy.json
@@ -109,6 +68,25 @@ resource "aws_ecs_task_definition" "task" {
   container_definitions = local.container_definitions
 }
 
+resource "aws_security_group" "ecs_sg" {
+  vpc_id = data.aws_vpc.vpc.id
+  name   = "${var.project_name}-ecs-sg"
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_ecs_service" "ecs" {
   depends_on = [aws_lb.lb]
 
@@ -130,7 +108,7 @@ resource "aws_ecs_service" "ecs" {
 
   network_configuration {
     assign_public_ip = true
-    security_groups  = [aws_security_group.sg.id]
+    security_groups  = [aws_security_group.ecs_sg.id]
     subnets          = aws_subnet.public_subnet.*.id
   }
 
@@ -139,6 +117,47 @@ resource "aws_ecs_service" "ecs" {
     container_name   = var.project_name
     container_port   = var.container_port
   }
+}
+
+resource "aws_security_group" "lb_sg" {
+  vpc_id = data.aws_vpc.vpc.id
+  name   = "${var.project_name}-lb-sg"
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_lb" "lb" {
+  name               = "${var.project_name}-lb"
+  internal           = false
+  load_balancer_type = "application"
+
+  enable_deletion_protection = false
+
+  security_groups = [aws_security_group.lb_sg.id]
+  subnets         = aws_subnet.public_subnet[*].id
+}
+
+resource "aws_lb_target_group" "tg" {
+  depends_on = [aws_lb.lb]
+
+  name     = "${var.project_name}-tg"
+  port     = var.container_port
+  protocol = "HTTP"
+  vpc_id   = data.aws_vpc.vpc.id
+
+  target_type = "ip"
 }
 
 resource "aws_lb_listener" "listener" {

@@ -14,7 +14,7 @@ variable "max_az" {
 }
 
 variable "project_name" {
-  type = string
+  type    = string
   default = "fargate-nextjs-webapp"
 }
 
