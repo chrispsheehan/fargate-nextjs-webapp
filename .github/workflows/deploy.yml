@@ -15,7 +15,7 @@ permissions:
   contents: read
       
 jobs:
-  build:
+  destroy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,6 +24,20 @@ jobs:
 
       - name: Build image
         uses: ./.github/actions/build_image
+        with:
+          aws_account_id: ${{ env.aws_account_id }}
+          aws_region: ${{ env.aws_region }}
+          aws_role: ${{ env.aws_role }}
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+            fetch-depth: 0
+
+      - name: Clean (destroy)
+        uses: ./destroy.yaml
         with:
           aws_account_id: ${{ env.aws_account_id }}
           aws_region: ${{ env.aws_region }}
