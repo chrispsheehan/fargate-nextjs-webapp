@@ -16,18 +16,7 @@ permissions:
       
 jobs:
   destroy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-            fetch-depth: 0
-
-      - name: Destroy (clean)
-        uses: ./.github/workflows/destroy.yml
-        with:
-          aws_account_id: ${{ env.aws_account_id }}
-          aws_region: ${{ env.aws_region }}
-          aws_role: ${{ env.aws_role }}
+    uses: ./.github/workflows/destroy.yml
 
   build:
     needs: destroy
