@@ -2,6 +2,7 @@ name: Destroy
 
 on:
   workflow_dispatch:
+  workflow_call:
 
 env:
   aws_account_id: ${{ vars.AWS_ACCOUNT_ID }}

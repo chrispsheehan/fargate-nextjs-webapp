@@ -22,7 +22,7 @@ jobs:
         with:
             fetch-depth: 0
 
-      - name: Build image
+      - name: Destroy (clean)
         uses: ./destroy.yml
         with:
           aws_account_id: ${{ env.aws_account_id }}
