@@ -15,19 +15,19 @@ permissions:
   contents: read
       
 jobs:
-  destroy:
+  clean:
     uses: ./.github/workflows/destroy.yml
 
   build:
-    needs: destroy
+    needs: clean
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
             fetch-depth: 0
 
-      - name: Clean (destroy)
-        uses: ./destroy.yaml
+      - name: Build image
+        uses: ./.github/actions/build_image
         with:
           aws_account_id: ${{ env.aws_account_id }}
           aws_region: ${{ env.aws_region }}
