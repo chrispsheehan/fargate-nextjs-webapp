@@ -124,8 +124,8 @@ resource "aws_security_group" "lb_sg" {
   name   = "${var.project_name}-lb-sg"
 
   ingress {
-    from_port   = 0
-    to_port     = 0
+    from_port   = var.load_balancer_port
+    to_port     = var.load_balancer_port
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
