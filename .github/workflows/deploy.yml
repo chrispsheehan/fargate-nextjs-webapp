@@ -23,13 +23,14 @@ jobs:
             fetch-depth: 0
 
       - name: Build image
-        uses: ./.github/actions/build_image
+        uses: ./destroy.yml
         with:
           aws_account_id: ${{ env.aws_account_id }}
           aws_region: ${{ env.aws_region }}
           aws_role: ${{ env.aws_role }}
 
   build:
+    needs: destroy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
