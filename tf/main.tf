@@ -126,7 +126,7 @@ resource "aws_security_group" "lb_sg" {
   ingress {
     from_port   = var.load_balancer_port
     to_port     = var.load_balancer_port
-    protocol    = "-1"
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
