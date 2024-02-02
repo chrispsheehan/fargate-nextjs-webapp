@@ -73,9 +73,9 @@ resource "aws_security_group" "ecs_sg" {
   name   = "${var.project_name}-ecs-sg"
 
   ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port   = var.container_port
+    to_port     = var.container_port
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
