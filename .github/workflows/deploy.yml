@@ -23,7 +23,7 @@ jobs:
             fetch-depth: 0
 
       - name: Destroy (clean)
-        uses: ./destroy.yml
+        uses: ./.github/workflows/destroy.yml
         with:
           aws_account_id: ${{ env.aws_account_id }}
           aws_region: ${{ env.aws_region }}
