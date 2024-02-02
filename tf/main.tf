@@ -45,8 +45,13 @@ resource "aws_iam_policy" "ecr_access_policy" {
   policy = data.aws_iam_policy_document.ecr_policy.json
 }
 
+resource "aws_iam_role" "ecs_task_role" {
+  name               = "${var.project_name}-ecs-task-role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
 resource "aws_iam_role_policy_attachment" "ecr_access_policy_attachment" {
-  role       = data.aws_iam_role.ecs_task_role.name
+  role       = aws_iam_role.ecs_task_role.name
   policy_arn = aws_iam_policy.ecr_access_policy.arn
 }
 
@@ -57,8 +62,8 @@ resource "aws_ecs_task_definition" "task" {
   cpu                      = var.cpu
   memory                   = var.memory
 
-  task_role_arn      = data.aws_iam_role.ecs_task_role.arn
-  execution_role_arn = data.aws_iam_role.ecs_task_role.arn
+  task_role_arn      = aws_iam_role.ecs_task_role.arn
+  execution_role_arn = aws_iam_role.ecs_task_role.arn
 
   runtime_platform {
     cpu_architecture        = "X86_64"
