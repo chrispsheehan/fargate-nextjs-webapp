@@ -47,7 +47,7 @@ data "aws_iam_policy_document" "ecr_policy" {
       # "ecr:BatchGetImage"
     ]
 
-    resources ["*"]
+    resources = ["*"]
   }
 }
 
