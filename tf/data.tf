@@ -35,16 +35,9 @@ data "aws_iam_policy_document" "assume_role" {
 data "aws_iam_policy_document" "ecr_policy" {
   statement {
     actions = [
-      "ecr:*"
-      # "ecr:ListImages",
-      # "ecr:GetRepositoryPolicy",
-      # "ecr:GetAuthorizationToken",
-      # "ecr:BatchCheckLayerAvailability",
-      # "ecr:GetDownloadUrlForLayer",
-      # "ecr:GetRepositoryPolicy",
-      # "ecr:DescribeRepositories",
-      # "ecr:ListImages",
-      # "ecr:BatchGetImage"
+      "ecr:GetAuthorizationToken",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:BatchGetImage"
     ]
 
     effect = "Allow"
