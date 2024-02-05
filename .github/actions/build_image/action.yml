@@ -14,19 +14,29 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Configure AWS Credentials
+    - uses: dorny/paths-filter@v3
+      id: changes
+      with:
+        filters: |
+          src:
+            - 'src/**'
+
+    - if: steps.changes.outputs.src == 'true'
+      name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-region: ${{ inputs.aws_region }}
         role-to-assume: arn:aws:iam::${{ inputs.aws_account_id }}:role/${{ inputs.aws_role }}
         role-session-name: GitHubActions
 
-    - name: checkout
+    - if: steps.changes.outputs.src == 'true'
+      name: checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
-    - name: Setup aws ECR
+    - if: steps.changes.outputs.src == 'true'
+      name: Setup aws ECR
       env:
         REPO_NAME: ${{ github.event.repository.name }}
         AWS_REGION: ${{ inputs.aws_region }}
@@ -34,7 +44,8 @@ runs:
       run: |
         bash bin/create_ecr_repo.sh
 
-    - name: Build
+    - if: steps.changes.outputs.src == 'true'
+      name: Build
       env:
         LOCAL_IMAGE: ${{ github.event.repository.name }}:local
         ECR_BASE: ${{ inputs.AWS_ACCOUNT_ID }}.dkr.ecr.${{ inputs.aws_region }}.amazonaws.com
