@@ -19,6 +19,11 @@ data "aws_ecr_repository" "ecr" {
   name = var.project_name
 }
 
+data "aws_ecr_image" "latest_image" {
+  repository_name = var.project_name
+  most_recent     = true
+}
+
 data "aws_iam_policy_document" "assume_role" {
   statement {
     effect = "Allow"
