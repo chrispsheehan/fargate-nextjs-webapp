@@ -15,11 +15,7 @@ permissions:
   contents: read
       
 jobs:
-  clean:
-    uses: ./.github/workflows/destroy.yml
-
   build:
-    needs: clean
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
