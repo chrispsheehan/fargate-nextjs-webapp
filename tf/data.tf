@@ -8,6 +8,13 @@ data "aws_availability_zones" "azs" {
   state = "available"
 }
 
+data "aws_internet_gateway" "igw" {
+  filter {
+    name   = "attachment.vpc-id"
+    values = [data.aws_vpc.vpc.id]
+  }
+}
+
 data "aws_ecr_repository" "ecr" {
   name = var.project_name
 }
