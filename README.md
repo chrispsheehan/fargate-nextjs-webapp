@@ -1,5 +1,23 @@
 # fargate-nextjs-webapps
 
+New image pushed to ecr upon changes detected in /src and subsequently deployed to ecs.
+
+## terraform
+
+Required deployment iam privileges.
+
+```json
+[
+    "dynamodb:*", 
+    "s3:*", 
+    "ecr:*", 
+    "iam:*", 
+    "ecs:*", "
+    ec2:*", 
+    "elasticloadbalancing:*"
+]
+```
+
 
 ## ci
 
