@@ -12,8 +12,8 @@ Required deployment iam privileges.
     "s3:*", 
     "ecr:*", 
     "iam:*", 
-    "ecs:*", "
-    ec2:*", 
+    "ecs:*",
+    "ec2:*", 
     "elasticloadbalancing:*"
 ]
 ```
