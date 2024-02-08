@@ -13,6 +13,13 @@
                 "appProtocol": "http"
             }
         ],
+        "healthcheck": {
+            "command": ["CMD-SHELL", "curl -f http://localhost:${container_port}/ || exit 1"]
+            "interval": 30
+            "retries": 3
+            "start_period": 60
+            "timeout": 5
+        }
         "essential": true,
         "environment": [],
         "environmentFiles": [],
