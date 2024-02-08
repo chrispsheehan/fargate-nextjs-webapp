@@ -1,6 +1,6 @@
 # fargate-nextjs-webapps
 
-New image pushed to ecr upon changes detected in /src and subsequently deployed to ecs.
+New image pushed to ecr upon changes detected in `/src` and subsequently deployed to ecs.
 
 ## terraform
 
