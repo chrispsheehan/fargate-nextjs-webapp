@@ -2,6 +2,10 @@
 
 New image pushed to ecr upon changes detected in `/src` and subsequently deployed to ecs.
 
+## run docker dev locally
+
+docker run --env-file .env -p 3000:3000 -w /app -v ${PWD}/src:/app node:20 npm run dev
+
 ## terraform
 
 Required deployment iam privileges.
