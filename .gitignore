@@ -5,3 +5,5 @@ src/out
 
 .terraform
 *.lock.hcl
+
+.env
