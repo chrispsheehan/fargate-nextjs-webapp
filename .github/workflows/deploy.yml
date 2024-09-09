@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 env:
   aws_account_id: ${{ vars.AWS_ACCOUNT_ID }}
