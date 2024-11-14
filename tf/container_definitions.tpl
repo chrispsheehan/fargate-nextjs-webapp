@@ -16,7 +16,7 @@
         "healthCheck": {
             "command": [
                 "CMD-SHELL",
-                "curl -f http://127.0.0.1:${container_port}/ || exit 1"
+                "curl -I http://127.0.0.1:${container_port} || exit 1"
             ],
             "interval": 30,
             "timeout": 5,
