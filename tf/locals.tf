@@ -9,8 +9,8 @@ locals {
     cpu                      = var.cpu
     memory                   = var.memory,
     aws_region               = var.region,
-    public_woodland_creature = var.public_woodland_creature
-    secret_woodland_creature = var.secret_woodland_creature
-    api_key_ssm_param_name   = var.api_key_ssm_param_name
+    api_key_ssm_param_name   = var.api_key_ssm_param_name,
+    cloudwatch_log_name      = local.cloudwatch_log_name
   })
 }
+ 
