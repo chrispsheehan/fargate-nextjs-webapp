@@ -13,16 +13,6 @@
                 "appProtocol": "http"
             }
         ],
-        ### "healthCheck": {
-        ###     "command": [
-        ###         "CMD-SHELL",
-        ###         "curl -f localhost:${container_port} || exit 1"
-        ###     ],
-        ###     "interval": 30,
-        ###     "timeout": 5,
-        ###     "retries": 3,
-        ###     "startPeriod": 10
-        ### },
         "logConfiguration": {
             "logDriver": "awslogs",
             "options": {
