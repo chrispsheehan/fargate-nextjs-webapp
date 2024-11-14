@@ -30,7 +30,8 @@ Required deployment iam privileges.
     "iam:*", 
     "ecs:*",
     "ec2:*", 
-    "elasticloadbalancing:*"
+    "elasticloadbalancing:*",
+    "ssm:*"
 ]
 ```
 
