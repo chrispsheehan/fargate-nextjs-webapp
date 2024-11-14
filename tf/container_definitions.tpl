@@ -16,7 +16,7 @@
         "healthcheck": {
             "command": [
                 "CMD-SHELL", 
-                "curl -f http://localhost:${container_port}/ || exit 1"
+                "wget -qO- http://0.0.0.0:${container_port} || exit 1"
             ],
             "interval": 30,
             "retries": 3,

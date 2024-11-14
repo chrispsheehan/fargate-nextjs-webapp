@@ -1,14 +1,5 @@
 FROM node:20
 
-# ARG _aws_region
-# ENV AWS_REGION=$_aws_region
-
-# ARG _api_key_ssm_param_name
-# ENV API_KEY_SSM_PARAM_NAME=$_api_key_ssm_param_name
-
-# ARG _next_public_woodland_creature
-# ENV NEXT_PUBLIC_WOODLAND_CREATURE==$_next_public_woodland_creature
-
 # syntax=docker.io/docker/dockerfile:1
 
 FROM node:18-alpine AS base
@@ -16,7 +7,7 @@ FROM node:18-alpine AS base
 # Install dependencies only when needed
 FROM base AS deps
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat wget
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
