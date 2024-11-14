@@ -60,7 +60,7 @@ resource "aws_iam_role_policy_attachment" "ecr_access_policy_attachment" {
   policy_arn = aws_iam_policy.ecr_access_policy.arn
 }
 
-resource "aws_iam_role_policy_attachment" "ecr_access_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "ssm_access_policy_attachment" {
   role       = aws_iam_role.ecs_task_role.name
   policy_arn = aws_iam_policy.ssm_access_policy.arn
 }
