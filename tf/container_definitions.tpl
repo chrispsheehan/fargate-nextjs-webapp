@@ -13,15 +13,15 @@
                 "appProtocol": "http"
             }
         ],
-        "healthcheck": {
-            "command": [
-                "CMD-SHELL", 
-                "wget -qO- http://127.0.0.1:${container_port}/ || exit 1"
-            ],
-            "interval": 5,
-            "timeout": 2,
-            "retries": 3,
-            "startPeriod": 10
+        "healthCheck": {
+        "command": [
+            "CMD-SHELL",
+            "curl -f http://127.0.0.1:${container_port}/ || { echo 'Health check failed with error:' $(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/) >> /proc/1/fd/1 2>&1; exit 1; }"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 0
         },
         "logConfiguration": {
             "logDriver": "awslogs",

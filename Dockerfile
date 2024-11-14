@@ -36,8 +36,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Install wget for health check support
-RUN apk add --no-cache libc6-compat wget
+# Install curl for health check support
+RUN apk add --no-cache libc6-compat curl
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
