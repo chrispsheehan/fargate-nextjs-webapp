@@ -16,12 +16,12 @@
         "healthCheck": {
             "command": [
                 "CMD-SHELL",
-                "curl -f http://127.0.0.1:${container_port}/ || { echo 'Health check failed with error:' $$(curl -s -o /dev/null -w '%%{http_code}' http://localhost:${container_port}/) >> /proc/1/fd/1 2>&1; exit 1; }"
+                "curl -f localhost:${container_port} || exit 1"
             ],
             "interval": 30,
             "timeout": 5,
             "retries": 3,
-            "startPeriod": 0
+            "startPeriod": 10
         },
         "logConfiguration": {
             "logDriver": "awslogs",
@@ -32,20 +32,18 @@
             }
         },
         "essential": true,
-        "environment": [
-            {
-                "name": "NEXT_PUBLIC_WOODLAND_CREATURE",
-                "value": "badger"
-            },
-            {
-                "name": "API_KEY_SSM_PARAM_NAME",
-                "value": "${api_key_ssm_param_name}"
-            },
-            {
-                "name": "AWS_REGION",
-                "value": "${aws_region}"
-            }
-        ],
+        "environment": [{
+          "name": "NEXT_PUBLIC_WOODLAND_CREATURE",
+          "value": "badger"
+        },
+        {
+          "name": "API_KEY_SSM_PARAM_NAME",
+          "value": "${api_key_ssm_param_name}"
+        },
+        {
+          "name": "AWS_REGION",
+          "value": "${aws_region}"
+        }],
         "environmentFiles": [],
         "mountPoints": [],
         "volumesFrom": [],
