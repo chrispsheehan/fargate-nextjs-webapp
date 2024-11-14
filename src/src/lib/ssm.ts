@@ -16,8 +16,8 @@ export async function getParameter(ssm_param_key: string | undefined) {
 
     try {
         const data = await client.send(command);
-        return data.Parameter?.Value;
+        return data.Parameter?.Value;    
     } catch (err) {
-        console.error("Failed to fetch parameter:", err);
+        console.error('Failed to fetch parameter')
     }
 }
