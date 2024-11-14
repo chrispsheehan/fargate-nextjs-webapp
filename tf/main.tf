@@ -50,6 +50,11 @@ resource "aws_iam_policy" "ssm_access_policy" {
   policy = data.aws_iam_policy_document.ecr_policy.json
 }
 
+resource "aws_iam_policy" "logs_access_policy" {
+  name   = "${local.formatted_name}_logs_access_policy"
+  policy = data.aws_iam_policy_document.logs_policy.json
+}
+
 resource "aws_iam_role" "ecs_task_role" {
   name               = "${var.project_name}-ecs-task-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
@@ -64,6 +69,12 @@ resource "aws_iam_role_policy_attachment" "ssm_access_policy_attachment" {
   role       = aws_iam_role.ecs_task_role.name
   policy_arn = aws_iam_policy.ssm_access_policy.arn
 }
+
+resource "aws_iam_role_policy_attachment" "logs_access_policy_attachment" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = aws_iam_policy.logs_access_policy.arn
+}
+
 
 resource "random_string" "api_key" {
   length  = 32
@@ -111,6 +122,11 @@ resource "aws_security_group" "ecs_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+resource "aws_cloudwatch_log_group" "ecs_log_group" {
+  name              = local.cloudwatch_log_name
+  retention_in_days = 1
 }
 
 resource "aws_ecs_service" "ecs" {

@@ -69,3 +69,19 @@ data "aws_iam_policy_document" "ssm_policy" {
     effect = "Allow"
   }
 }
+
+data "aws_iam_policy_document" "logs_policy" {
+  statement {
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "${aws_cloudwatch_log_group.ecs_log_group.arn}",
+      "${aws_cloudwatch_log_group.ecs_log_group.arn}:*"
+    ]
+  }
+}
