@@ -16,12 +16,12 @@
         "healthcheck": {
             "command": [
                 "CMD-SHELL", 
-                "wget -qO- http://0.0.0.0:${container_port} || exit 1"
+                "nc -z 0.0.0.0 ${container_port} || exit 1"
             ],
-            "interval": 30,
+            "interval": 5,
+            "timeout": 2,
             "retries": 3,
-            "start_period": 60,
-            "timeout": 5
+            "startPeriod": 10
         },
         "logConfiguration": {
             "logDriver": "awslogs",
