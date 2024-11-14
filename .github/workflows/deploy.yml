@@ -29,6 +29,7 @@ jobs:
           aws_account_id: ${{ env.aws_account_id }}
           aws_region: ${{ env.aws_region }}
           aws_role: ${{ env.aws_role }}
+          api_key_ssm_param_name: ${{ env.api_key_ssm_param_name }}
 
   deploy:
     needs: build
