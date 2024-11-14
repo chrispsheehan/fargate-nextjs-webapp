@@ -140,7 +140,7 @@ resource "aws_ecs_service" "ecs" {
 
   deployment_circuit_breaker {
     enable   = true
-    rollback = true
+    rollback = false
   }
 
   deployment_controller {
