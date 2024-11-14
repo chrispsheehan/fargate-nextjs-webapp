@@ -57,7 +57,7 @@ runs:
         API_KEY_SSM_PARAM_NAME: ${{ inputs.api_key_ssm_param_name }}
       shell: bash
       run: |
-        docker build --build-arg _next_public_woodland_creature=badger --build-arg _secret_woodland_creature=ferret --build-arg _api_key_ssm_param_name='${{ env.API_KEY_SSM_PARAM_NAME }}' --build-arg _aws_region='${{ env.aws_region }}' . -t ${{ env.LOCAL_IMAGE }}
+        docker build . -t ${{ env.LOCAL_IMAGE }}
         docker tag ${{ env.LOCAL_IMAGE }} ${{ env.ECR_URL }}:${{ env.IMAGE_TAG }}
         aws ecr get-login-password --region ${{ env.aws_region }} | docker login --username AWS --password-stdin ${{ env.ECR_BASE }}
         docker push ${{ env.ECR_URL }}:${{ env.IMAGE_TAG }}

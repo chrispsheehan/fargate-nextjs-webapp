@@ -32,7 +32,18 @@
             }
         },
         "essential": true,
-        "environment": [],
+        "environment": [{
+          "name": "NEXT_PUBLIC_WOODLAND_CREATURE",
+          "value": "badger"
+        },
+        {
+          "name": "API_KEY_SSM_PARAM_NAME",
+          "value": "${api_key_ssm_param_name}"
+        },
+        {
+          "name": "AWS_REGION",
+          "value": "${aws_region}"
+        }],
         "environmentFiles": [],
         "mountPoints": [],
         "volumesFrom": [],
