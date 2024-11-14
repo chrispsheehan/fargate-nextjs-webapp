@@ -10,6 +10,9 @@ inputs:
   aws_role:
     description: 'AWS role to assume'
     required: true
+  api_key_ssm_param_name:
+    description: ssm param to be consumed buy app
+    required: true
 
 runs:
   using: composite
@@ -53,7 +56,7 @@ runs:
         IMAGE_TAG: $(echo $GITHUB_SHA | cut -c 1-6)
       shell: bash
       run: |
-        docker build . -t ${{ env.LOCAL_IMAGE }}
+        docker build --build-arg _api_key_ssm_param_name='${{ inputs.api_key_ssm_param_name }}' --build-arg _aws_region='${{ inputs.aws_region }}'' . -t ${{ env.LOCAL_IMAGE }}
         docker tag ${{ env.LOCAL_IMAGE }} ${{ env.ECR_URL }}:${{ env.IMAGE_TAG }}
         aws ecr get-login-password --region ${{ env.aws_region }} | docker login --username AWS --password-stdin ${{ env.ECR_BASE }}
         docker push ${{ env.ECR_URL }}:${{ env.IMAGE_TAG }}
