@@ -4,6 +4,10 @@ data "aws_vpc" "vpc" {
   default = true
 }
 
+data "aws_ssm_parameter" "api_key" {
+  name = var.api_key_ssm_param_name
+}
+
 data "aws_availability_zones" "azs" {
   state = "available"
 }
@@ -51,3 +55,17 @@ data "aws_iam_policy_document" "ecr_policy" {
   }
 }
 
+data "aws_iam_policy_document" "ssm_policy" {
+  statement {
+    actions = [
+      "ssm:GetParameter",
+      "ssm:GetParameters",
+      "ssm:GetParameterHistory",
+      "ssm:GetParametersByPath"
+    ]
+    resources = [
+      data.aws_ssm_parameter.api_key.arn
+    ]
+    effect = "Allow"
+  }
+}

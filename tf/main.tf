@@ -45,6 +45,11 @@ resource "aws_iam_policy" "ecr_access_policy" {
   policy = data.aws_iam_policy_document.ecr_policy.json
 }
 
+resource "aws_iam_policy" "ssm_access_policy" {
+  name   = "${local.formatted_name}_ssm_access_policy"
+  policy = data.aws_iam_policy_document.ecr_policy.json
+}
+
 resource "aws_iam_role" "ecs_task_role" {
   name               = "${var.project_name}-ecs-task-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
@@ -53,6 +58,11 @@ resource "aws_iam_role" "ecs_task_role" {
 resource "aws_iam_role_policy_attachment" "ecr_access_policy_attachment" {
   role       = aws_iam_role.ecs_task_role.name
   policy_arn = aws_iam_policy.ecr_access_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ecr_access_policy_attachment" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = aws_iam_policy.ssm_access_policy.arn
 }
 
 resource "random_string" "api_key" {
