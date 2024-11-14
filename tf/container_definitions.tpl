@@ -16,7 +16,7 @@
         "healthcheck": {
             "command": [
                 "CMD-SHELL", 
-                "wget -qO- http://127.0.0.1:${container_port}/api/health || exit 1"
+                "wget -qO- http://127.0.0.1:${container_port}/ || exit 1"
             ],
             "interval": 5,
             "timeout": 2,
