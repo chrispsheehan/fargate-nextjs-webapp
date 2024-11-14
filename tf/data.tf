@@ -68,6 +68,16 @@ data "aws_iam_policy_document" "ssm_policy" {
     ]
     effect = "Allow"
   }
+
+  statement {
+    actions = [
+      "kms:Decrypt"
+    ]
+    resources = [
+      "arn:aws:kms:${var.region}:${data.aws_caller_identity.current.account_id}:alias/aws/ssm"
+    ]
+    effect = "Allow"
+  }
 }
 
 data "aws_iam_policy_document" "logs_policy" {
