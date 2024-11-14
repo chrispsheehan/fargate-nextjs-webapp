@@ -16,7 +16,7 @@
         "healthCheck": {
             "command": [
                 "CMD-SHELL",
-                "curl -f http://127.0.0.1:${container_port}/ || { echo 'Health check failed with error:' $$(curl -s -o /dev/null -w '%{http_code}' http://localhost:${container_port}/) >> /proc/1/fd/1 2>&1; exit 1; }"
+                "curl -f http://127.0.0.1:${container_port}/ || { echo 'Health check failed with error:' $$(curl -s -o /dev/null -w '%%{http_code}' http://localhost:${container_port}/) >> /proc/1/fd/1 2>&1; exit 1; }"
             ],
             "interval": 30,
             "timeout": 5,
