@@ -24,7 +24,24 @@
             "timeout": 5
         },
         "essential": true,
-        "environment": [],
+        "environment": [
+            {
+                "name": "AWS_REGION",
+                "value": "${aws_region}"
+            },
+            {
+                "name": "NEXT_PUBLIC_WOODLAND_CREATURE",
+                "value": "${public_woodland_creature}"
+            },
+            {
+                "name": "SECRET_WOODLAND_CREATURE",
+                "value": "${secret_woodland_creature}"
+            },
+            {
+                "name": "API_KEY_SSM_PARAM_NAME",
+                "value": "${api_key_ssm_param_name}"
+            }
+        ],
         "environmentFiles": [],
         "mountPoints": [],
         "volumesFrom": [],

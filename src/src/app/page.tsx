@@ -1,7 +1,10 @@
+import { getParameter } from "@/lib/ssm";
 import Image from "next/image";
 
-export default function Home() {
+export default async function Home() {
 
+  const apiKeySsmParamName = process.env.API_KEY_SSM_PARAM_NAME;
+  const apiKey = await getParameter(apiKeySsmParamName);
   const public_woodland_creature = process.env.NEXT_PUBLIC_WOODLAND_CREATURE;
   const secret_woodland_creature = process.env.SECRET_WOODLAND_CREATURE;
 

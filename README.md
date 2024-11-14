@@ -4,7 +4,17 @@ New image pushed to ecr upon changes detected in `/src` and subsequently deploye
 
 ## run docker dev locally
 
+```sh
 docker run --env-file .env -p 3000:3000 -w /app -v ${PWD}/src:/app node:20 npm run dev
+```
+
+## env vars
+
+[reference](https://nextjs.org/docs/pages/building-your-application/configuring/environment-variables#bundling-environment-variables-for-the-browser)
+
+`NEXT_PUBLIC_WOODLAND_CREATURE` is save for browser
+`SECRET_WOODLAND_CREATURE` is *not safe* for browser - only for backend/runtime
+`API_KEY_SSM_PARAM_NAME` key to get value from ssm
 
 ## terraform
 

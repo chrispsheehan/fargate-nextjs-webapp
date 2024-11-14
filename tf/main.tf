@@ -55,6 +55,17 @@ resource "aws_iam_role_policy_attachment" "ecr_access_policy_attachment" {
   policy_arn = aws_iam_policy.ecr_access_policy.arn
 }
 
+resource "random_string" "api_key" {
+  length  = 32
+  special = false
+}
+
+resource "aws_ssm_parameter" "api_key_ssm" {
+  name  = var.api_key_ssm_param_name
+  type  = "SecureString"
+  value = random_string.api_key.result
+}
+
 resource "aws_ecs_task_definition" "task" {
   family                   = "${var.project_name}-task"
   network_mode             = "awsvpc"

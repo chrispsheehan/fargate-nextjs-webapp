@@ -18,6 +18,20 @@ variable "project_name" {
   default = "fargate-nextjs-webapp"
 }
 
+variable "public_woodland_creature" {
+  type    = string
+  default = "badger-from-tf"
+}
+
+variable "secret_woodland_creature" {
+  type    = string
+  default = "ferret-from-tf"
+}
+
+variable "api_key_ssm_param_name" {
+  type = string
+}
+
 variable "image_tag" {
   type    = string
   default = "latest"
