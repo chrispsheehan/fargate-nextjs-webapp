@@ -75,7 +75,6 @@ resource "aws_iam_role_policy_attachment" "logs_access_policy_attachment" {
   policy_arn = aws_iam_policy.logs_access_policy.arn
 }
 
-
 resource "random_string" "api_key" {
   length  = 32
   special = false
@@ -130,7 +129,7 @@ resource "aws_cloudwatch_log_group" "ecs_log_group" {
 }
 
 resource "aws_ecs_service" "ecs" {
-  depends_on = [aws_lb.lb]
+  depends_on = [aws_lb.lb, aws_cloudwatch_log_group.ecs_log_group, aws_iam_role_policy_attachment.logs_access_policy_attachment]
 
   name                  = var.project_name
   launch_type           = "FARGATE"
