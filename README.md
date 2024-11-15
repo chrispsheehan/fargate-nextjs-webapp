@@ -19,10 +19,13 @@ npm run start
 
 [reference](https://nextjs.org/docs/pages/building-your-application/configuring/environment-variables#bundling-environment-variables-for-the-browser)
 
-build locally - `API_KEY_SSM_PARAM_NAME=/some/thing AWS_REGION=eu-west-2 npm run build`
+`AWS_REGION` used to get ssm on server side
 
-`NEXT_PUBLIC_WOODLAND_CREATURE` is save for browser
-`API_KEY_SSM_PARAM_NAME` key to get value from ssm
+`NEXT_PUBLIC_WOODLAND_CREATURE` is exposed to browser
+
+`API_KEY_SSM_PARAM_NAME` key to get value from ssm on refresh
+
+`STATIC_SECRET` secret injected into container on startup
 
 ## terraform
 
