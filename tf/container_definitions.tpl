@@ -16,7 +16,7 @@
         "healthCheck": {
             "command": [
                 "CMD-SHELL",
-                "curl -I http://127.0.0.1:${container_port} || exit 1"
+                "curl -I http://0.0.0.0:${container_port} || exit 1"
             ],
             "interval": 30,
             "timeout": 5,
@@ -43,6 +43,10 @@
         {
           "name": "AWS_REGION",
           "value": "${aws_region}"
+        },
+        {
+          "name": "HOSTNAME",
+          "value": "0.0.0.0"
         }],
         "environmentFiles": [],
         "mountPoints": [],
