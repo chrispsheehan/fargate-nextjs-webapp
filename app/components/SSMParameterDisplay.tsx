@@ -1,35 +1,46 @@
 // components/SSMParameterDisplay.tsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-// Allow apiKey and error to be string or undefined
-interface SSMParameterDisplayProps {
-  apiKey?: string;  // Optional prop
-  error?: string;   // Optional prop
-}
+const SSMParameterDisplay: React.FC = () => {
+  const [apiKeyMasked, setApiKeyMasked] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-const SSMParameterDisplay: React.FC<SSMParameterDisplayProps> = ({ apiKey, error }) => {
-  // If there's an error, display the error message
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  useEffect(() => {
+    const fetchApiKey = async () => {
+      try {
+        const response = await fetch('/api/getApiKey');
+        if (!response.ok) {
+          throw new Error("Failed to fetch API key");
+        }
 
-  // Display the first and last character of the apiKey if it exists
-  if (apiKey) {
-    const firstChar = apiKey[0];
-    const lastChar = apiKey.slice(-1);
-    return (
-      <div>
-        <h2>API Key Retrieved from SSM:</h2>
-        <p>
-          <strong>First Character:</strong> {firstChar} <br />
-          <strong>Last Character:</strong> {lastChar}
-        </p>
-      </div>
-    );
-  }
+        const data = await response.json();
+        console.log("API Response:", data); // Log API response for confirmation
 
-  // If no apiKey and no error, display a loading message
-  return <div>Loading...</div>;
+        if (data.apiKeyMasked) {
+          setApiKeyMasked(data.apiKeyMasked); // Use the masked key directly from the response
+        } else {
+          throw new Error("API key not found in response");
+        }
+      } catch (err) {
+        console.error("Error fetching masked API key:", err);
+        setError("Error fetching API key");
+      }
+    };
+
+    fetchApiKey();
+  }, []);
+
+  return (
+    <div style={{ padding: '1em', border: '1px solid #ccc', borderRadius: '8px', width: 'fit-content', marginTop: '1em' }}>
+      <h2>API Key Accessed server side SSM PoC</h2>
+      <h3>First / last characters below</h3>
+      {error ? (
+        <p style={{ color: 'red' }}>Error: {error}</p>
+      ) : (
+        <p style={{ fontWeight: 'bold', color: '#333', fontSize: '1.2em' }}>{apiKeyMasked || 'Loading...'}</p>
+      )}
+    </div>
+  );
 };
 
 export default SSMParameterDisplay;

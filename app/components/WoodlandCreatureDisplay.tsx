@@ -7,6 +7,7 @@ const WoodlandCreatureDisplay: React.FC = () => {
   return (
     <div>
       <h2>Our Woodland Creature</h2>
+      <h3>Set via NEXT_PUBLIC_WOODLAND_CREATURE client side env var</h3>
       <p>{creature ? `The woodland creature is a ${creature}` : "Creature not specified"}</p>
     </div>
   );
