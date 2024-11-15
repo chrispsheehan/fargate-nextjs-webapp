@@ -45,6 +45,16 @@ resource "aws_iam_policy" "ecr_access_policy" {
   policy = data.aws_iam_policy_document.ecr_policy.json
 }
 
+resource "aws_iam_policy" "ssm_access_policy" {
+  name   = "${local.formatted_name}_ssm_access_policy"
+  policy = data.aws_iam_policy_document.ssm_policy.json
+}
+
+resource "aws_iam_policy" "logs_access_policy" {
+  name   = "${local.formatted_name}_logs_access_policy"
+  policy = data.aws_iam_policy_document.logs_policy.json
+}
+
 resource "aws_iam_role" "ecs_task_role" {
   name               = "${var.project_name}-ecs-task-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
@@ -53,6 +63,38 @@ resource "aws_iam_role" "ecs_task_role" {
 resource "aws_iam_role_policy_attachment" "ecr_access_policy_attachment" {
   role       = aws_iam_role.ecs_task_role.name
   policy_arn = aws_iam_policy.ecr_access_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_access_policy_attachment" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = aws_iam_policy.ssm_access_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "logs_access_policy_attachment" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = aws_iam_policy.logs_access_policy.arn
+}
+
+resource "random_string" "static_secret" {
+  length  = 32
+  special = false
+}
+
+resource "aws_ssm_parameter" "static_secret_ssm" {
+  name  = local.static_secret_ssm_name
+  type  = "SecureString"
+  value = random_string.static_secret.result
+}
+
+resource "random_string" "api_key" {
+  length  = 32
+  special = false
+}
+
+resource "aws_ssm_parameter" "api_key_ssm" {
+  name  = var.api_key_ssm_param_name
+  type  = "SecureString"
+  value = random_string.api_key.result
 }
 
 resource "aws_ecs_task_definition" "task" {
@@ -92,19 +134,24 @@ resource "aws_security_group" "ecs_sg" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "ecs_log_group" {
+  name              = local.cloudwatch_log_name
+  retention_in_days = 1
+}
+
 resource "aws_ecs_service" "ecs" {
-  depends_on = [aws_lb.lb]
+  depends_on = [aws_lb.lb, aws_cloudwatch_log_group.ecs_log_group, aws_iam_role_policy_attachment.logs_access_policy_attachment]
 
   name                  = var.project_name
   launch_type           = "FARGATE"
   cluster               = aws_ecs_cluster.cluster.id
   task_definition       = aws_ecs_task_definition.task.arn
   desired_count         = var.desired_count
-  wait_for_steady_state = true
+  wait_for_steady_state = false
 
   deployment_circuit_breaker {
     enable   = true
-    rollback = true
+    rollback = false
   }
 
   deployment_controller {
@@ -163,6 +210,16 @@ resource "aws_lb_target_group" "tg" {
   vpc_id   = data.aws_vpc.vpc.id
 
   target_type = "ip"
+
+  health_check {
+    interval            = 10
+    path                = "/api/health"
+    protocol            = "HTTP"
+    matcher             = "200"
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
 }
 
 resource "aws_lb_listener" "listener" {

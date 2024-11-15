@@ -18,6 +18,10 @@ variable "project_name" {
   default = "fargate-nextjs-webapp"
 }
 
+variable "api_key_ssm_param_name" {
+  type = string
+}
+
 variable "image_tag" {
   type    = string
   default = "latest"

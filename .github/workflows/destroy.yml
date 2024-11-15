@@ -8,6 +8,8 @@ env:
   aws_account_id: ${{ vars.AWS_ACCOUNT_ID }}
   aws_region: ${{ vars.AWS_REGION }}
   aws_role: ${{ vars.AWS_ROLE }}
+  TF_VAR_api_key_ssm_param_name: /fargate_nextjs_webapp/api_key
+
 
 permissions:
   id-token: write

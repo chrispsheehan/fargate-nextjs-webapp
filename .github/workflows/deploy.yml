@@ -10,6 +10,7 @@ env:
   aws_account_id: ${{ vars.AWS_ACCOUNT_ID }}
   aws_region: ${{ vars.AWS_REGION }}
   aws_role: ${{ vars.AWS_ROLE }}
+  api_key_ssm_param_name: /fargate_nextjs_webapp/api_key
 
 permissions:
   id-token: write
@@ -29,6 +30,7 @@ jobs:
           aws_account_id: ${{ env.aws_account_id }}
           aws_region: ${{ env.aws_region }}
           aws_role: ${{ env.aws_role }}
+          api_key_ssm_param_name: ${{ env.api_key_ssm_param_name }}
 
   deploy:
     needs: build
@@ -56,6 +58,8 @@ jobs:
       - name: Action
         shell: bash
         id: action
+        env:
+          TF_VAR_api_key_ssm_param_name: ${{ env.api_key_ssm_param_name }}
         run: |
             cd tf
             terraform apply -auto-approve -var project_name=${{ github.event.repository.name }} -var image_tag=$(echo $GITHUB_SHA | cut -c 1-6)
