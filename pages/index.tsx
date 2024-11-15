@@ -1,35 +1,34 @@
 // pages/index.tsx
+import React from 'react';
 import SSMParameterDisplay from '../app/components/SSMParameterDisplay';
 import WoodlandCreatureDisplay from '../app/components/WoodlandCreatureDisplay';
 import StaticSecretDisplay from '../app/components/StaticSecretDisplay';
-import React from 'react';
 
 interface HomePageProps {
-  staticSecret: string;
+  staticSecretMasked: string;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ staticSecret }) => {
+const HomePage: React.FC<HomePageProps> = ({ staticSecretMasked }) => {
   return (
     <div>
       <h1>Welcome to the Application</h1>
 
-      {/* Render the SSMParameterDisplay component */}
+      {/* Render components */}
       <SSMParameterDisplay />
       <WoodlandCreatureDisplay />
-      
-      {/* Render the StaticSecretDisplay component with the fetched staticSecret */}
-      <StaticSecretDisplay secret={staticSecret} />
+      <StaticSecretDisplay secret={staticSecretMasked} />
     </div>
   );
 }
 
 export async function getServerSideProps() {
-  // Fetch the STATIC_SECRET from environment variables
-  const staticSecret = process.env.STATIC_SECRET || '';
+  // Retrieve the secret and mask it to show only the first and last characters
+  const secret = process.env.STATIC_SECRET || '';
+  const maskedSecret = secret.length > 1 ? `${secret[0]}${'*'.repeat(secret.length - 2)}${secret[secret.length - 1]}` : secret;
 
   return {
     props: {
-      staticSecret,
+      staticSecretMasked: maskedSecret,
     },
   };
 }
