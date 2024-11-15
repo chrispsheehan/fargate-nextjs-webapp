@@ -1,6 +1,8 @@
 // pages/index.tsx
 import { GetParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
 import SSMParameterDisplay from '../app/components/SSMParameterDisplay';
+import WoodlandCreatureDisplay from '../app/components/WoodlandCreatureDisplay';
+import React from 'react';
 
 // Function to fetch the SSM parameter from AWS
 async function fetchSSMParameter(ssmParamKey: string) {
@@ -60,6 +62,7 @@ export default function HomePage({ apiKey, error }: { apiKey?: string; error?: s
 
       {/* Render the SSMParameterDisplay component, passing in apiKey or error */}
       <SSMParameterDisplay apiKey={apiKey} error={error} />
+      <WoodlandCreatureDisplay />
     </div>
   );
 }

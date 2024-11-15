@@ -13,12 +13,17 @@ const SSMParameterDisplay: React.FC<SSMParameterDisplayProps> = ({ apiKey, error
     return <div>Error: {error}</div>;
   }
 
-  // If apiKey is provided, display it
+  // Display the first and last character of the apiKey if it exists
   if (apiKey) {
+    const firstChar = apiKey[0];
+    const lastChar = apiKey.slice(-1);
     return (
       <div>
-        <h2>Retrieved API Key:</h2>
-        <p>{apiKey}</p>
+        <h2>API Key Retrieved from SSM:</h2>
+        <p>
+          <strong>First Character:</strong> {firstChar} <br />
+          <strong>Last Character:</strong> {lastChar}
+        </p>
       </div>
     );
   }

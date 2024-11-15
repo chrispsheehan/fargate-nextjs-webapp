@@ -5,13 +5,12 @@ New image pushed to ecr upon changes detected in `/src` and subsequently deploye
 ## run dev locally
 
 ```sh
-npm i -prefix app
-npm run build -prefix app
-docker build . -t nextjs-local:1.0
-docker run --env-file .env -p 3000:3000 nextjs-local:1.0
+npm i
+npm run build
+npm run start
 ```
 
-## env vars
+## overview
 
 `/app` is the frontend (client side) code
 `/pages` is the backend (server side) code
@@ -53,3 +52,14 @@ Required github action variables.
 - `AWS_REGION`
 - `AWS_ROLE` role with deployment privileges
 - `AWS_ROLE_VALIDATE_ONLY` role with readonly privileges (can be same as `AWS_ROLE`)
+
+
+## gotchas
+
+- health checks failing trigging a rollback. 
+  - issue: ECS will override env vars. `HOSTNAME` is required to enable a container to hit localhost for health checks.
+  - debug: local docker run health check simulation works fine.
+  - fix: 
+    - add install for `curl` in dockerfile
+    - add the `HOSTNAME` env var with value `0.0.0.0` to the ECS task definition
+    - hit `http://0.0.0.0:${container_port}` in the task health check
