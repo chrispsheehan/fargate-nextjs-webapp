@@ -60,7 +60,8 @@ data "aws_iam_policy_document" "ssm_policy" {
       "ssm:GetParametersByPath"
     ]
     resources = [
-      aws_ssm_parameter.api_key_ssm.arn
+      aws_ssm_parameter.api_key_ssm.arn,
+      aws_ssm_parameter.static_secret_ssm.arn
     ]
     effect = "Allow"
   }

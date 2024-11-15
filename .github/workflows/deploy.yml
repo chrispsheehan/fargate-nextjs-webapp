@@ -3,7 +3,7 @@ name: Deploy
 on:
   push:
     branches:
-      - main
+      - handle-envs
 
 env:
   aws_account_id: ${{ vars.AWS_ACCOUNT_ID }}

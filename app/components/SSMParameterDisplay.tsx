@@ -32,7 +32,7 @@ const SSMParameterDisplay: React.FC = () => {
 
   return (
     <div style={{ padding: '1em', border: '1px solid #ccc', borderRadius: '8px', width: 'fit-content', marginTop: '1em' }}>
-      <h2>API Key Accessed server side SSM PoC</h2>
+      <h2>Secret live-loaded Accessed server side SSM PoC</h2>
       <h3>First / last characters below</h3>
       {error ? (
         <p style={{ color: 'red' }}>Error: {error}</p>

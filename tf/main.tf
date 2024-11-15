@@ -75,6 +75,17 @@ resource "aws_iam_role_policy_attachment" "logs_access_policy_attachment" {
   policy_arn = aws_iam_policy.logs_access_policy.arn
 }
 
+resource "random_string" "static_secret" {
+  length  = 32
+  special = false
+}
+
+resource "aws_ssm_parameter" "static_secret_ssm" {
+  name  = local.static_secret_ssm_name
+  type  = "SecureString"
+  value = random_string.static_secret.result
+}
+
 resource "random_string" "api_key" {
   length  = 32
   special = false
