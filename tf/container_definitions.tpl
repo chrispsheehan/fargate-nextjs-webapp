@@ -48,10 +48,6 @@
           "name": "HOSTNAME",
           "value": "0.0.0.0"
         }],
-        "environment": [{
-          "name": "NEXT_PUBLIC_WOODLAND_CREATURE",
-          "value": "badger"
-        }],
         "secrets": [
           {
             "name": "STATIC_SECRET",
